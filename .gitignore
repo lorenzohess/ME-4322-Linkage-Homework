@@ -1,0 +1,14 @@
+**/*.auctex-auto
+**/*.aux
+**/*.bbl*
+**/*.bcf*
+**/*.blg
+**/*.fdb_latexmk
+**/*.fls
+**/*.lof
+**/*.log
+**/*.out
+**/*.run.xml
+**/*.toc
+**/*.xdv
+**/_minted*

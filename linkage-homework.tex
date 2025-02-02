@@ -1,0 +1,192 @@
+\documentclass[12pt]{article}
+\usepackage[printonlyused,withpage]{acronym} % acronyms
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[page,title,toc]{appendix} % appendix
+\usepackage{array} % tables (?)
+\usepackage{bbold} % \mathbb
+\usepackage[backend=biber, style=apa]{biblatex} % bibliography
+\usepackage{bm} % bold math
+\usepackage{caption} % better captioning and figure numbering (?)
+\usepackage{changepage} % some landscape pages
+\usepackage{csquotes} % \blockquote
+\usepackage{enumitem} % control spacing
+\usepackage{etoolbox} % for a macro (?)
+\usepackage{fancyhdr}				% For fancy header/footer
+\usepackage{float}      % use the [H] option for positioning
+\usepackage[T1]{fontenc}
+\usepackage{fontspec}
+\usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
+\usepackage{gensymb} % \degree symbol
+\usepackage{glossaries} % glossary
+\usepackage{graphicx}				% For including figure/image
+\usepackage[margin=1.0in,includehead,includefoot]{geometry}		% For setting margins
+\usepackage{import}    % \incfig
+\usepackage[iso,american]{isodate}
+\usepackage{makecell}  % multi-row table cells
+%\usepackage{mathptmx}  % make math Times New Roman
+%\usepackage{minted}    % code styling
+\usepackage{pdflscape} % make \incfig to landscape
+\usepackage{pdfpages} % \includepdf
+%\usepackage{pgffor} % iterate over the modular files to import their labels
+\usepackage{pgfplots} % bar chart
+\usepackage{ragged2e} % \raggedright
+\usepackage{setspace} % {single,one-half}space \doublespacing
+\usepackage{soul} % underline across line breaks
+\usepackage{svg}
+\usepackage{textcomp} % textcomp to get rid of gensymb warnings
+%\usepackage{times} % Times New Roman, only pdflatex
+\usepackage{transparent} % \incfig (breaks pgffor)
+\usepackage[normalem]{ulem} % allow \smash of underlines
+\usepackage{vcell} % vertical writing in table cells (?)
+\usepackage{wrapfig} % \incfig
+\usepackage{xifthen} % \incfig
+\usepackage{xparse} % ?
+\usepackage{xr} % ?
+
+% hYpErReF mUsT cOmE lAsT
+\usepackage[hidelinks]{hyperref} % \href{url}{text}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,filecolor=black,citecolor=black}
+
+% svg and Inkscape's pdf_tex
+\newcommand{\incfig}[2]{
+	\def\svgwidth{#1\columnwidth}
+	\import{./}{#2.pdf_tex}
+}
+
+% Bibliography
+%\addbibresource{}
+
+% Font size reminder
+% \tiny \small \normalsize \large \Large \Huge
+%\setmainfont{Times New Roman}
+\setmonofont{Mononoki Nerd Font Mono}[Scale=MatchLowercase]
+
+%%% Macros
+% Horizontal Spacing
+\newcommand\hs{\hspace{1cm}}
+\newcommand\hhs{\hspace{0.5cm}}
+% Singlespacing in certain environments: \ssInEnv{environment, font=\normalsize}
+% \newcommand{\ssInEnv}[2][\normalsize]{\BeforeBeginEnvironment{#2}{\begin{singlespace*}{#1}}\AfterEndEnvironment{#2}{\end{singlespace*}}}
+% Fancy header and footer for homeworks
+\newcommand\hwheadfoot{
+\pagestyle{fancy}
+\fancyhead[LO,L]{Lorenzo Hess}
+\fancyhead[CO,C]{CLASS: Homework NUMBER} % TODO
+\fancyhead[RO,R]{\today} % TODO
+%\fancyfoot[LO,L]{}
+\fancyfoot[CO,C]{\thepage}
+%\fancyfoot[RO,R]{}
+\topmargin=-0.75in
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}}
+
+% Homework problems with arbitrary numbers without worrying about section formatting and counters
+\newcommand{\problemSection}[1]{ % Args = section number
+\noindent\Large\textbf{Section #1}
+}
+\newcommand{\problem}[1]{ % Args = number
+\noindent\large\textbf{Problem #1}
+}
+
+% Volume symbol (heat transfer)
+\newcommand{\volume}{{\ooalign{\hfil$V$\hfil\cr\kern0.08em--\hfil\cr}}}
+
+% Table of Contents tweaks
+% Singlespacing
+\let\oldToC\tableofcontents
+\renewcommand{\tableofcontents}{\begin{singlespace}\oldToC\end{singlespace}}
+% Include subsubsections
+\setcounter{tocdepth}{3}
+
+% Spacing
+\singlespacing
+% \ssInEnv{itemize}
+% \ssInEnv{enumerate}
+% \ssInEnv{tabular}
+\setlist{listparindent=\parindent, % indent paragraphs under \item
+  nolistsep} % no spacing between list items
+
+% Smash underlines
+\let\oldunderline\underline
+\renewcommand{\underline}[1]{\oldunderline{\smash{#1}}}
+\setlength\ULdepth{1.5pt}
+
+% Minted code styling
+%\usemintedstyle{friendly}
+%\setminted[matlab]{fontsize=\normalsize, breaklines=true, breakanywhere=true, linenos=true, numbersep=6pt, stripnl=true, baselinestretch=1}
+%\setminted[text]{fontsize=\scriptsize, breaklines=true, breakanywhere=true, linenos=false, numbersep=6pt, stripnl=true, baselinestretch=1}
+
+\author{Lorenzo Hess}
+\date{\today}
+\title{Homework 1: Linkage Analysis}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Assumptions}%
+\label{assum}
+
+\section{Free-Body Diagrams}%
+\label{fbds}
+
+\section{Statics and Dynamics Equations}%
+\label{eqns}
+
+\subsection{Forces and Moments}%
+\label{eqns.forces-moments}
+
+\subsection{Mass Calculations}%
+\label{eqns.masses}
+
+\subsection{Mass Moment of Inertia Calculations}%
+\label{eqns.mmi}
+
+\subsection{Kinematics Equations}%
+\label{eqns.kinematics}
+
+\subsubsection{Position}%
+\label{eqns.kinematics.position}
+
+\subsubsection{Velocity}%
+\label{eqns.kinematics.velocity}
+
+\subsubsection{Acceleration}%
+\label{eqns.kinematics.acceleration}
+
+\subsection{Accelerations at CMs}%
+\label{eqns.accels}
+
+\section{Results}%
+\label{res}
+
+\subsection{First Position}%
+\label{res.first}
+
+\subsubsection{Joint Forces and Torques}%
+\label{res.first.joints}
+
+\subsubsection{Postion, Velocity, and Acceleration}%
+\label{res.first.kin}
+
+\subsubsection{Masses and Mass Moments of Inertia}%
+\label{res.first.mass-mmi}
+
+\subsection{Plots}%
+\label{res.plots}
+
+\subsection{Comparison with PMKS+}%
+\label{res.compare}
+
+\section{MATLAB Code}%
+\label{code}
+
+\section{Discussion}%
+\label{discuss}
+
+\section{References}%
+\label{ref}
+
+\end{document}

@@ -1,0 +1,14 @@
+joints
+id,x,y,links,type,ground,angle,coeffOfFriction,input
+A,1.4,0.485,AB,R,true,0,0.1,true,
+B,1.67,0.99,AB,R,false,0,0.1,false,
+links
+id,mass,mass_moi,center_of_mass_x,center_of_mass_y,joints,forces,shape,b1x,b1y,b2x,b2y,b3x,b3y,b4x,b4y
+AB,1,1,1.535,0.7375,"A,B","",line,1.67,0.485,1.4,0.485,1.4,0.99,1.67,0.99
+forces
+id,link,startx,starty,endx,endy,fixed,direction,xMag,yMag
+pathPoints
+id,x,y,neighbor1,neighbor2
+settings
+input_speed_mag,clockwise,gravity,unit
+10,false,false,cm
