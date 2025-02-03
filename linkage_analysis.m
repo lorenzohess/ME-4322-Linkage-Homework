@@ -1,5 +1,33 @@
-clc; clear; hold on; axis equal; format long;
-% clc; clear; format long;
+clc; clear; format long;
 
-linkage = Linkage();
+plots = initializePlots();
+
+linkage = Linkage(plots);
 linkage.analyze()
+
+function plots = initializePlots()
+    % Set up figures
+    plots = struct('jointPos', {},...
+                   'linkAngVel', {},...
+                   'linkAngAccel', {}...
+                  );
+    % 'jointVel', {},...
+    % 'jointAccel', {},...
+    % 'accel', {},...
+    % 'staticForce', {},...
+    % 'staticTorque', {},...
+    % 'dynamicForce', {},...
+    % 'dynamicTorque', {},...
+    % plots = struct('jointPos', {},...
+    %                'jointVel', {})
+    plotNames = fieldnames(plots);
+    plots = struct();
+
+    for i = 1:numel(plotNames)
+        fieldName = plotNames{i};
+        figure('Name', fieldName);
+        plots.(fieldName) = axes;
+        hold(plots.(fieldName), 'on')
+        axis(plots.(fieldName), 'equal')
+    end
+end

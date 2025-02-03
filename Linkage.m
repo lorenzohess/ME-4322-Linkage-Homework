@@ -14,12 +14,15 @@ classdef Linkage
         l3
         l4
         l5
+
         % Pre-compute distance between jC and jE because computing during iteration
         % yields incorrect position analysis (error builds up in position of C).
         DISTANCE_JC_TO_JE = 1.506195538434502;
+
+        plots
     end
     methods
-        function obj = Linkage()
+        function obj = Linkage(plots)
             obj.jA = Joint("A", 1.4, 0.485, true, 'k.');
             obj.jB = Joint("B", 1.67, 0.99, false, 'r.');
             obj.jC = Joint("C", 0.255, 1.035, false, 'g.');
@@ -34,6 +37,8 @@ classdef Linkage
             obj.l4 = Link("4", 1.1754, 1, 1, [obj.jE, obj.jF]);
             obj.l5 = Link("5", 2.5841, 1, 1, [obj.jG, obj.jF]);
             obj.crank = obj.l1;
+
+            obj.plots = plots;
         end
 
         function analyze(obj)
@@ -77,20 +82,20 @@ classdef Linkage
         function updatePositions(obj)
         % Compute position of Joint B
             c = obj.crank.updateCoords();
-            plot(c(1), c(2), obj.jB.color);
+            plot(obj.plots.jointPos, c(1), c(2), obj.jB.color)
 
             % Compute position of Joint C
             c = obj.circleIntersection(obj.jC, obj.jB, obj.jD, obj.l2.length,...
                                        [obj.l3.jointToJointDistance(obj.jD, obj.jC)]);
-            plot(c(1), c(2), obj.jC.color);
+            plot(obj.plots.jointPos, c(1), c(2), obj.jC.color);
 
             % Compute position of Joint E
             c = obj.circleIntersection(obj.jE, obj.jC, obj.jD, obj.DISTANCE_JC_TO_JE, obj.l3.length);
-            plot(c(1), c(2), obj.jE.color);
+            plot(obj.plots.jointPos, c(1), c(2), obj.jE.color);
 
             % Compute position of Joint F
             c = obj.circleIntersection(obj.jF, obj.jG, obj.jE, obj.l5.length, obj.l4.length);
-            plot(c(1), c(2), obj.jF.color);
+            plot(obj.plots.jointPos, c(1), c(2), obj.jF.color);
         end
 
         function updateAngularVelocities(obj)
@@ -104,7 +109,14 @@ classdef Linkage
 
             soln = solve([loop1, loop2], [obj.l2.angularVelocity, obj.l3.angularVelocity,...
                                           obj.l4.angularVelocity, obj.l5.angularVelocity]);
+            obj.plotLinkAngularVelocities(obj.crank.angle, soln)
         end
 
+        function plotLinkAngularVelocities(obj, crankAngle, omegaSoln)
+            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega2, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
+            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega3, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
+            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega4, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
+            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega5, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
+        end
     end
 end
