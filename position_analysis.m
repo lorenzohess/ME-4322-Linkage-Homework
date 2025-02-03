@@ -1,7 +1,7 @@
 clc; clear; hold on;
 
 jA = Joint("A", 1.4, 0.485, true);
-jB = Joint("B", 1.69, 0.99, false);
+jB = Joint("B", 1.67, 0.99, false);
 jC = Joint("C", 0.255, 1.035, false);
 jD = Joint("D", 0.285, 0.055, true);
 jE = Joint("E", 0.195, 2.54, false);
