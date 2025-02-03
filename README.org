@@ -1,0 +1,3 @@
+* README
+** Assumptions
+1. Links have at most one grounded joint.
