@@ -129,6 +129,11 @@
 \section{Assumptions}%
 \label{assum}
 
+\begin{enumerate}
+        \item Steady-state rate of 7450 parts in seven hours
+\end{enumerate}
+
+
 \section{Free-Body Diagrams}%
 \label{fbds}
 
@@ -152,6 +157,15 @@
 
 \subsubsection{Velocity}%
 \label{eqns.kinematics.velocity}
+
+To solve the angular velocities, we require the steady-state crank angular velocity, $\omega_{1}$. With a part per hour rate of 7450 parts per seven hours, we can compute:
+\[ \dot{p} = \frac{7450 \text{part}}{7 \text{hr}} = 0.29 \frac{\text{part}}{\text{sec}} \]
+\[ p^{-1} = 3.38 \frac{\text{s}}{\text{part}} \]
+By inspection of the PMKS+ model, we see that the output link completes one cycle at the same rate as the input link. Thus:
+\[ \omega_{1} = \omega_{5} \]
+The output link delivers one part per revolution, so the output link angular velocity is:
+\[ \omega_{5} = \frac{2\pi}{p^{-1}}\cdot \text{1 part}  \]
+\[ \Rightarrow \omega_{1} = 21.25 \text{rad}/\text{s} \]
 
 \subsubsection{Acceleration}%
 \label{eqns.kinematics.acceleration}

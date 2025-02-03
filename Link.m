@@ -5,21 +5,27 @@ classdef Link < handle
         mmi
         joints % list of Joint
         groundJoint
+        num % integer ID, e.g. 1
     end
 
     properties
         angle % degrees
+        angularVelocity sym % symbolic
     end
 
     methods
         % Constructor
-        function obj = Link(length, mass, mmi, joints)
+        function obj = Link(num, length, mass, mmi, joints)
+            obj.num = num;
             obj.length = length;
             obj.mass = mass;
             obj.mmi = mmi;
             obj.joints = joints;
             obj.angle = obj.initialAngle();
             obj.checkForGround();
+
+            omega = sym("omega" + num2str(obj.num));
+            obj.angularVelocity = omega;
         end
 
         % Getters
@@ -31,6 +37,10 @@ classdef Link < handle
             for joint = obj.joints
                 disp("Joint " + joint.name + ": " + joint.x + ", " + joint.y)
             end
+        end
+
+        function angularVelocityVector = getAngularVelocityVector(obj)
+            angularVelocityVector = [0 0 obj.angularVelocity];
         end
 
         % Methods
@@ -49,9 +59,14 @@ classdef Link < handle
             angle = rad2deg(atan2(deltaY, deltaX));
         end
 
-        function newAngle = updateAngle(obj)
-            obj.angle = obj.angle + 1;
+        function newAngle = incrementAngle(obj, value)
+            obj.angle = obj.angle + value;
             % disp("New angle: " + obj.angle)
+        end
+
+        function vector = jointToJointVector(obj, jHead, jTail)
+            Z = 0;
+            vector = [jHead.x - jTail.x, jHead.y - jTail.y, Z];
         end
 
         function distance = jointToJointDistance(obj, j1, j2)
