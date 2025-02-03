@@ -8,22 +8,20 @@ classdef Joint < handle
     properties
         x % global x coordinate
         y % global y coordinate
-        coords
     end
     methods
         function obj = Joint(name, x, y, ground)
             obj.name = name;
             obj.x = x;
             obj.y = y;
-            obj.coords = [x, y];
             if (ground)
                 obj.ground = ground;
             end
         end
 
         % Getters
-        function coords = get.coords(obj)
-            coords = obj.coords;
+        function coords = getCoords(obj)
+            coords = [obj.x, obj.y];
         end
 
         function name = get.name(obj)

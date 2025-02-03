@@ -54,15 +54,8 @@ classdef Link < handle
             disp("New angle: " + obj.angle)
         end
 
-        function updatedCoords = updateCoords(obj)
-            for joint = obj.joints
-                if (~joint.ground)
-                    newX = obj.groundJoint.x + obj.length * cos(deg2rad(obj.angle));
-                    newY = obj.groundJoint.y + obj.length * sin(deg2rad(obj.angle));
-                    joint.setCoords(newX, newY);
-                    updatedCoords = [newX, newY];
-                end
-            end
+        function distance = jointToJointDistance(obj, j1, j2)
+            distance = sqrt((j1.x - j2.x)^2 + (j1.y - j2.y)^2);
         end
     end
 end
