@@ -51,7 +51,7 @@ classdef Link < handle
 
         function newAngle = updateAngle(obj)
             obj.angle = obj.angle + 1;
-            disp("New angle: " + obj.angle)
+            % disp("New angle: " + obj.angle)
         end
 
         function distance = jointToJointDistance(obj, j1, j2)

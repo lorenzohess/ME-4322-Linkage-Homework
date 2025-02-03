@@ -3,20 +3,20 @@ classdef Joint < handle
         type = "Revolute"; % default
         links % list of Link
         name
-        ground = false; % default
+        ground % default
+        color
     end
     properties
         x % global x coordinate
         y % global y coordinate
     end
     methods
-        function obj = Joint(name, x, y, ground)
+        function obj = Joint(name, x, y, ground, color)
             obj.name = name;
             obj.x = x;
             obj.y = y;
-            if (ground)
-                obj.ground = ground;
-            end
+            obj.color = color;
+            obj.ground = ground;
         end
 
         % Getters
@@ -26,6 +26,10 @@ classdef Joint < handle
 
         function name = get.name(obj)
             name = obj.name;
+        end
+
+        function color = get.color(obj)
+            color = obj.color;
         end
 
         % Setters
