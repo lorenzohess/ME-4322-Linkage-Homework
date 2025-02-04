@@ -33,7 +33,7 @@ classdef Linkage
 
             obj.l1 = Crank("1", 0.5726, 1, 1, [obj.jA obj.jB]);
             obj.l2 = Link("2", 1.4157, 1, 1, [obj.jB obj.jC]);
-            obj.l3 = Link("3", 2.4866, 1, 1, [obj.jC, obj.jD, obj.jE]);
+            obj.l3 = Link("3", 2.4866, 1, 1, [obj.jD, obj.jC, obj.jE]);
             obj.l4 = Link("4", 1.1754, 1, 1, [obj.jE, obj.jF]);
             obj.l5 = Link("5", 2.5841, 1, 1, [obj.jG, obj.jF]);
             obj.crank = obj.l1;
@@ -99,13 +99,8 @@ classdef Linkage
         end
 
         function updateAngularVelocities(obj)
-            loop1 = cross(obj.crank.getAngularVelocityVector(), obj.crank.jointToJointVector(obj.jB, obj.jA)) +...
-                    cross(obj.l2.getAngularVelocityVector(), obj.l2.jointToJointVector(obj.jC, obj.jB)) +...
-                    cross(obj.l3.getAngularVelocityVector(), obj.l3.jointToJointVector(obj.jD, obj.jC));
-
-            loop2 = cross(obj.l3.getAngularVelocityVector(), obj.l3.jointToJointVector(obj.jE, obj.jD)) +...
-                    cross(obj.l4.getAngularVelocityVector(), obj.l4.jointToJointVector(obj.jF, obj.jE)) +...
-                    cross(obj.l5.getAngularVelocityVector(), obj.l5.jointToJointVector(obj.jG, obj.jF));
+            loop1 = obj.crank.getVelocity() + obj.l2.getVelocity(obj.jB, obj.jC) + obj.l3.getVelocity(obj.jC, obj.jD);
+            loop2 = obj.l3.getVelocity(obj.jE) + obj.l4.getVelocity(obj.jE, obj.jF) + obj.l5.getVelocity(obj.jF, obj.jG);
 
             soln = solve([loop1, loop2], [obj.l2.angularVelocity, obj.l3.angularVelocity,...
                                           obj.l4.angularVelocity, obj.l5.angularVelocity]);

@@ -7,6 +7,7 @@ classdef Crank < Link
         INPUT_ANGULAR_VELOCITY = 21.25; % rad/s
         INPUT_ANGULAR_ACCELERATION = 0; % rad/s/s
     end
+
     methods
         function obj = Crank(num, length, mass, mmi, joints)
             obj@Link(num, length, mass, mmi, joints);
@@ -14,13 +15,11 @@ classdef Crank < Link
         end
 
         function updatedCoords = updateCoords(obj)
-            for joint = obj.joints
-                if (~joint.ground)
-                    newX = obj.groundJoint.x + obj.length * cos(deg2rad(obj.angle));
-                    newY = obj.groundJoint.y + obj.length * sin(deg2rad(obj.angle));
-                    joint.setCoords(newX, newY);
-                    updatedCoords = [newX, newY];
-                end
+            for joint = obj.nonGroundJoints
+                newX = obj.groundJoint.x + obj.length * cos(deg2rad(obj.angle));
+                newY = obj.groundJoint.y + obj.length * sin(deg2rad(obj.angle));
+                joint.setCoords(newX, newY);
+                updatedCoords = [newX, newY];
             end
         end
     end

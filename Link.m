@@ -5,6 +5,7 @@ classdef Link < handle
         mmi
         joints % list of Joint
         groundJoint
+        nonGroundJoints = [];
         num % integer ID, e.g. 1
     end
 
@@ -22,7 +23,7 @@ classdef Link < handle
             obj.mmi = mmi;
             obj.joints = joints;
             obj.angle = obj.initialAngle();
-            obj.checkForGround();
+            obj.assignGround();
 
             omega = sym("omega" + num2str(obj.num));
             obj.angularVelocity = omega;
@@ -31,6 +32,10 @@ classdef Link < handle
         % Getters
         function len = get.length(obj)
             len = obj.length;
+        end
+
+        function nonGroundJoints = get.nonGroundJoints(obj)
+            nonGroundJoints = obj.nonGroundJoints;
         end
 
         function printJointCoords(obj)
@@ -43,12 +48,31 @@ classdef Link < handle
             angularVelocityVector = [0 0 obj.angularVelocity];
         end
 
+        function velocity = getVelocity(obj, jTail, jHead)
+        % Assumes position vector goes from tail ground joint to head non-ground
+        % joint, or if neither joint is grounded, then from tail joints(1) to
+        % head joints(2), unless headJoint is given, in which head is headJoint.
+            % disp("Link: " + obj.num)
+            if 1 == nargin % no args, ground -> non-ground, i.e. binary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(1);
+            elseif 2 == nargin % jTail arg, ground -> second non-ground, i.e. ternary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(2);
+            else % both jTail and jHead arg
+            end
+            velocity = cross(obj.getAngularVelocityVector(),...
+                             [obj.jointToJointVector(jHead, jTail)]);
+        end
+
         % Methods
-        function checkForGround(obj)
+        function assignGround(obj)
+        % Doesn't handle more than one ground joint per link
             for joint = obj.joints
                 if (joint.ground)
                     obj.groundJoint = joint;
-                    return;
+                else
+                    obj.nonGroundJoints = [obj.nonGroundJoints joint];
                 end
             end
         end
