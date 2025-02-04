@@ -48,6 +48,7 @@ classdef Linkage
 
                 obj.updatePositions();
                 obj.updateAngularVelocities();
+                obj.updateAngularAccelerations();
             end
         end
 
@@ -102,16 +103,40 @@ classdef Linkage
             loop1 = obj.crank.getVelocity() + obj.l2.getVelocity(obj.jB, obj.jC) + obj.l3.getVelocity(obj.jC, obj.jD);
             loop2 = obj.l3.getVelocity(obj.jE) + obj.l4.getVelocity(obj.jE, obj.jF) + obj.l5.getVelocity(obj.jF, obj.jG);
 
-            soln = solve([loop1, loop2], [obj.l2.angularVelocity, obj.l3.angularVelocity,...
-                                          obj.l4.angularVelocity, obj.l5.angularVelocity]);
-            obj.plotLinkAngularVelocities(obj.crank.angle, soln)
+            soln = solve([loop1, loop2], [obj.l2.symAngularVelocity, obj.l3.symAngularVelocity,...
+                                          obj.l4.symAngularVelocity, obj.l5.symAngularVelocity]);
+            obj.l2.angularVelocity = soln.omega2;
+            obj.l3.angularVelocity = soln.omega3;
+            obj.l4.angularVelocity = soln.omega4;
+            obj.l5.angularVelocity = soln.omega5;
+            obj.plotLinkAngularVelocities();
         end
 
-        function plotLinkAngularVelocities(obj, crankAngle, omegaSoln)
-            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega2, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
-            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega3, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
-            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega4, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
-            plot(obj.plots.linkAngVel, crankAngle, omegaSoln.omega5, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
+        function updateAngularAccelerations(obj)
+            loop1 = obj.crank.getAcceleration() + obj.l2.getAcceleration(obj.jB, obj.jC) + obj.l3.getAcceleration(obj.jC, obj.jD);
+            loop2 = obj.l3.getAcceleration(obj.jE) + obj.l4.getAcceleration(obj.jE, obj.jF) + obj.l5.getAcceleration(obj.jF, obj.jG);
+
+            soln = solve([loop1, loop2], [obj.l2.symAngularAcceleration, obj.l3.symAngularAcceleration,...
+                                          obj.l4.symAngularAcceleration, obj.l5.symAngularAcceleration]);
+            obj.l2.angularAcceleration = soln.alpha2;
+            obj.l3.angularAcceleration = soln.alpha3;
+            obj.l4.angularAcceleration = soln.alpha4;
+            obj.l5.angularAcceleration = soln.alpha5;
+            obj.plotLinkAngularAccelerations();
+        end
+
+        function plotLinkAngularVelocities(obj)
+            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l2.angularVelocity, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
+            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l3.angularVelocity, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
+            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l4.angularVelocity, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
+            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l5.angularVelocity, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
+        end
+
+        function plotLinkAngularAccelerations(obj)
+            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l2.angularAcceleration, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
+            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l3.angularAcceleration, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
+            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l4.angularAcceleration, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
+            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l5.angularAcceleration, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
         end
     end
 end

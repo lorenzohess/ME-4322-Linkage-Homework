@@ -11,7 +11,10 @@ classdef Link < handle
 
     properties
         angle % degrees
-        angularVelocity sym % symbolic
+        angularVelocity = 0; % initial
+        angularAcceleration = 0; % initial
+        symAngularVelocity sym
+        symAngularAcceleration sym
     end
 
     methods
@@ -26,7 +29,10 @@ classdef Link < handle
             obj.assignGround();
 
             omega = sym("omega" + num2str(obj.num));
-            obj.angularVelocity = omega;
+            obj.symAngularVelocity = omega;
+
+            alpha = sym("alpha" + num2str(obj.num));
+            obj.symAngularAcceleration = alpha;
         end
 
         % Getters
@@ -45,10 +51,54 @@ classdef Link < handle
         end
 
         function angularVelocityVector = getAngularVelocityVector(obj)
-            angularVelocityVector = [0 0 obj.angularVelocity];
+            angularVelocityVector = [0 0 obj.symAngularVelocity];
+        end
+
+        function angVel = get.angularVelocity(obj)
+            angVel = obj.angularVelocity;
         end
 
         function velocity = getVelocity(obj, jTail, jHead)
+        % Assumes position vector goes from tail ground joint to head non-ground
+        % joint, or if neither joint is grounded, then from tail joints(1) to
+        % head joints(2), unless headJoint is given, in which head is headJoint.
+            if 1 == nargin % no args, ground -> non-ground, i.e. binary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(1);
+            elseif 2 == nargin % jTail arg, ground -> second non-ground, i.e. ternary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(2);
+            else % both jTail and jHead arg
+            end
+            velocity = cross(obj.getAngularVelocityVector(),...
+                             [obj.jointToJointVector(jHead, jTail)]);
+        end
+
+        function v = getCurrentAngularVelocityVector(obj)
+            v = [0 0 obj.angularVelocity];
+        end
+
+        function velocity = getCurrentVelocity(obj, jTail, jHead)
+        % Assumes position vector goes from tail ground joint to head non-ground
+        % joint, or if neither joint is grounded, then from tail joints(1) to
+        % head joints(2), unless headJoint is given, in which head is headJoint.
+            if 1 == nargin % no args, ground -> non-ground, i.e. binary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(1);
+            elseif 2 == nargin % jTail arg, ground -> second non-ground, i.e. ternary link
+                jTail = obj.groundJoint;
+                jHead = obj.nonGroundJoints(2);
+            else % both jTail and jHead arg
+            end
+            velocity = cross(obj.getCurrentAngularVelocityVector(),...
+                             [obj.jointToJointVector(jHead, jTail)]);
+        end
+
+        function angularAccelerationVector = getAngularAccelerationVector(obj)
+            angularAccelerationVector = [0 0 obj.symAngularAcceleration];
+        end
+
+        function acceleration = getAcceleration(obj, jTail, jHead)
         % Assumes position vector goes from tail ground joint to head non-ground
         % joint, or if neither joint is grounded, then from tail joints(1) to
         % head joints(2), unless headJoint is given, in which head is headJoint.
@@ -61,8 +111,9 @@ classdef Link < handle
                 jHead = obj.nonGroundJoints(2);
             else % both jTail and jHead arg
             end
-            velocity = cross(obj.getAngularVelocityVector(),...
-                             [obj.jointToJointVector(jHead, jTail)]);
+            normal = cross(obj.getAngularAccelerationVector(), [obj.jointToJointVector(jHead, jTail)]);
+            tangential = cross(obj.getCurrentAngularVelocityVector(), obj.getCurrentVelocity(jTail, jHead));
+            acceleration = normal + tangential;
         end
 
         % Methods
