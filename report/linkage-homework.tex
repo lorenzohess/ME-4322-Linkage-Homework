@@ -152,13 +152,29 @@
 \subsection{Kinematics Equations}%
 \label{eqns.kinematics}
 
+I developed my kinematic equations from two vector loops: A-B-C-D-A and D-E-F-G-D. Note that these represent two four-bar linkages in series, with ternary link DEC as the common link.
+
 \subsubsection{Position}%
 \label{eqns.kinematics.position}
+
+For loop ABCDA, the position loop is:
+\[ \vec{r}_{b/a} + \vec{r}_{c/b} + \vec{r}_{d/c} + \vec{r}_{a/d} = 0 \]
+For loop DEFGD, the position loop is:
+\[ \vec{r}_{e/d} + \vec{r}_{f/e} + \vec{r}_{g/f} + \vec{r}_{g/d} = 0 \]
 
 \subsubsection{Velocity}%
 \label{eqns.kinematics.velocity}
 
-To solve the angular velocities, we require the steady-state crank angular velocity, $\omega_{1}$. With a part per hour rate of 7450 parts per seven hours, we can compute:
+Differentiate the positions loop equations to derive the velocity loop equations:
+\[ \vec{v}_{b/a} + \vec{v}_{c/b} + \vec{v}_{d/c} + \vec{v}_{a/d} = 0 \]
+\[ \vec{v}_{e/d} + \vec{v}_{f/e} + \vec{v}_{g/f} + \vec{v}_{g/d} = 0 \]
+The velocity of a joint $j$ relative to $i$ can be decomposed into translational and rotational components:
+\[ \vec{v}_{j/i} = \vec{v}_{i} + (\omega_{ij}\times \vec{r}_{j/i}) \]
+For a ground joint $i$, $\vec{v}_{i}$ is zero. For joints $i$ and $j$ of the same rigid link, their relative translational velocity is also zero. All joints and links in this linkage satisfy these conditions, so all translational velocity terms are zero for all joints. Therefore, the velocity loop equations for the loop equations reduce to the rotational components:
+\[ (\vec{\omega}_{ab}\times \vec{r}_{b/a}) + (\vec{\omega}_{bc}\times \vec{r}_{c/b}) + (\vec{\omega}_{cd}\times \vec{r}_{d/c}) + (\vec{\omega}_{da}\times \vec{r}_{a/d}) = 0 \]
+\[ (\vec{\omega}_{de}\times \vec{r}_{e/d}) + (\vec{\omega}_{ef}\times \vec{r}_{f/e}) + (\vec{\omega}_{fg}\times \vec{r}_{g/f}) + (\vec{\omega}_{dg}\times \vec{r}_{g/d}) = 0 \]\\
+
+To solve the loop equations we require the steady-state crank angular velocity, $\omega_{1}$. With a part per hour rate of 7450 parts per seven hours, we can compute:
 \[ \dot{p} = \frac{7450 \text{part}}{7 \text{hr}} = 0.29 \frac{\text{part}}{\text{sec}} \]
 \[ p^{-1} = 3.38 \frac{\text{s}}{\text{part}} \]
 By inspection of the PMKS+ model, we see that the output link completes one cycle at the same rate as the input link. Thus:
@@ -170,8 +186,16 @@ The output link delivers one part per revolution, so the output link angular vel
 \subsubsection{Acceleration}%
 \label{eqns.kinematics.acceleration}
 
+Differentiate the velocity loop equations to derive the acceleration loop equations. Begin by differentiating the general rotational velocity:
+\[ \frac{d }{d t} \left( \omega_{j/i}\times \vec{r}_{j/i} \right) = (\vec{\alpha}_{j/i}\times \vec{r}_{j/i}) +  \omega_{j/i}\times (\omega_{j/i}\times \vec{r}_{j/i}) \]
+Written compactly, the acceleration loop equations are thus:
+\[ \Sigma (\vec{\alpha}_{j/i}\times \vec{r}_{j/i}) +  \omega_{j/i}\times (\omega_{j/i}\times \vec{r}_{j/i}) \text{ for } i,j \cap \{(a,b),(b,c),(c,d),(d,a)\} \]
+\[ \Sigma (\vec{\alpha}_{j/i}\times \vec{r}_{j/i}) +  \omega_{j/i}\times (\omega_{j/i}\times \vec{r}_{j/i}) \text{ for } i,j \cap \{(d,e),(e,f),(f,g),(g,d)\} \]
+
 \subsection{Accelerations at CMs}%
 \label{eqns.accels}
+
+The acceleration at the center of mass of a link
 
 \section{Results}%
 \label{res}

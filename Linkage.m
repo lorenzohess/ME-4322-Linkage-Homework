@@ -48,6 +48,7 @@ classdef Linkage
 
                 obj.updatePositions();
                 obj.updateAngularVelocities();
+                obj.updateLinearVelocities();
                 obj.updateAngularAccelerations();
             end
         end
@@ -100,8 +101,10 @@ classdef Linkage
         end
 
         function updateAngularVelocities(obj)
-            loop1 = obj.crank.getVelocity() + obj.l2.getVelocity(obj.jB, obj.jC) + obj.l3.getVelocity(obj.jC, obj.jD);
-            loop2 = obj.l3.getVelocity(obj.jE) + obj.l4.getVelocity(obj.jE, obj.jF) + obj.l5.getVelocity(obj.jF, obj.jG);
+            loop1 = obj.crank.getSymVelocity() + obj.l2.getSymVelocity(obj.jB, obj.jC) +...
+                    obj.l3.getSymVelocity(obj.jC, obj.jD);
+            loop2 = obj.l3.getSymVelocity(obj.jE) + obj.l4.getSymVelocity(obj.jE, obj.jF) +...
+                    obj.l5.getSymVelocity(obj.jF, obj.jG);
 
             soln = solve([loop1, loop2], [obj.l2.symAngularVelocity, obj.l3.symAngularVelocity,...
                                           obj.l4.symAngularVelocity, obj.l5.symAngularVelocity]);
@@ -112,9 +115,12 @@ classdef Linkage
             obj.plotLinkAngularVelocities();
         end
 
+        function updateLinearVelocities(obj)
+        end
+
         function updateAngularAccelerations(obj)
-            loop1 = obj.crank.getAcceleration() + obj.l2.getAcceleration(obj.jB, obj.jC) + obj.l3.getAcceleration(obj.jC, obj.jD);
-            loop2 = obj.l3.getAcceleration(obj.jE) + obj.l4.getAcceleration(obj.jE, obj.jF) + obj.l5.getAcceleration(obj.jF, obj.jG);
+            loop1 = obj.crank.getSymAcceleration() + obj.l2.getSymAcceleration(obj.jB, obj.jC) + obj.l3.getSymAcceleration(obj.jC, obj.jD);
+            loop2 = obj.l3.getSymAcceleration(obj.jE) + obj.l4.getSymAcceleration(obj.jE, obj.jF) + obj.l5.getSymAcceleration(obj.jF, obj.jG);
 
             soln = solve([loop1, loop2], [obj.l2.symAngularAcceleration, obj.l3.symAngularAcceleration,...
                                           obj.l4.symAngularAcceleration, obj.l5.symAngularAcceleration]);

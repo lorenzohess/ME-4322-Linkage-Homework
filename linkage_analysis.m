@@ -28,6 +28,8 @@ function plots = initializePlots()
         figure('Name', fieldName);
         plots.(fieldName) = axes;
         hold(plots.(fieldName), 'on')
-        axis(plots.(fieldName), 'equal')
+        if (fieldName ~= "linkAngAccel")
+            axis(plots.(fieldName), 'equal')
+        end
     end
 end
