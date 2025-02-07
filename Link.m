@@ -2,7 +2,9 @@ classdef Link < handle
     properties (SetAccess = private)
         length % meters
         mass
+        weight
         mmi
+        com
         joints % list of Joint
         groundJoint
         nonGroundJoints = [];
@@ -15,6 +17,8 @@ classdef Link < handle
         angularAcceleration = 0; % initial
         symAngularVelocity sym
         symAngularAcceleration sym
+        symRx
+        symRy
     end
 
     methods
@@ -23,16 +27,28 @@ classdef Link < handle
             obj.num = num;
             obj.length = length;
             obj.mass = mass;
+            obj.weight = mass * 9.81;
             obj.mmi = mmi;
             obj.joints = joints;
             obj.angle = obj.initialAngle();
             obj.assignGround();
+            obj.com = obj.computeCOM();
 
             omega = sym("omega" + num2str(obj.num));
             obj.symAngularVelocity = omega;
 
             alpha = sym("alpha" + num2str(obj.num));
             obj.symAngularAcceleration = alpha;
+
+            % Rx = sym("Rx" + num2str(obj.num));
+        end
+
+        function comVector = computeCOM(obj)
+            if length(obj.groundJoint) > 0
+                comVector = [obj.groundJoint.x, obj.groundJoint.x] + [obj.nonGroundJoints(1).x / 2, obj.nonGroundJoints(1).y / 2];
+            else
+                comVector = [obj.nonGroundJoints(1).x, obj.nonGroundJoints(1).y] + [obj.nonGroundJoints(2).x / 2, obj.nonGroundJoints(2).y / 2];
+            end
         end
 
         function printJointCoords(obj)
@@ -127,7 +143,12 @@ classdef Link < handle
 
         function vector = jointToJointVector(obj, jHead, jTail)
             Z = 0;
-            vector = [jHead.x - jTail.x, jHead.y - jTail.y, Z];
+            % HACK to check if jHead is Joint or COM vector
+            if isobject(jHead)
+                vector = [jHead.x - jTail.x, jHead.y - jTail.y, Z];
+            else
+                vector = [jHead(1) - jTail.x, jHead(2) - jTail.y, Z];
+            end
         end
 
         function distance = jointToJointDistance(obj, j1, j2)

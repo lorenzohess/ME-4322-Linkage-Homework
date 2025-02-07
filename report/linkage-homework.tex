@@ -143,6 +143,27 @@
 \subsection{Forces and Moments}%
 \label{eqns.forces-moments}
 
+\subsubsection{Static Equilibrium}%
+\label{eqns.forces-moments.static}
+
+At static equilibrium, the net force and moment on each link is zero. Figures \ref{fig:fbd-ab}, \ref{fig:fbd-bc}, \ref{fig:fbd-cde}, \ref{fig:fbd-ef}, and \ref{fig:fbd-fg} show free-body diagrams of each link, with an input torque $\tau_{\text{in}}$, weights $W$, at center of masses $s$, and with artifact weight $W_{\text{art}}$.
+
+Each link yields one vector force equations; link AB also yields one vector moment equation. All force equations have two components, and the moment equation has three components.
+
+For link AB, with moments summed at point $A$:
+\[ R_{a,x} - R_{b,x} = 0 \hs R_{a,y} - R_{b,y} - W_{ab} = 0 \hs \vec{\tau}_{in} - \vec{r}_{s/a}\times \vec{W}_{ab} - \vec{r}_{b/a}\times \vec{R}_{b} \]
+For link BC:
+\[ R_{b,x} - R_{c,x} = 0 \hs R_{b,y} - R_{c,y} - W_{bc} = 0 \]
+For link CDE:
+\[ R_{d,x} + R_{c,x} - R_{e,x} = 0 \hs R_{d,y} + R_{c,y} - R_{e,y} - W_{cde} = 0 \]
+For link EF:
+\[ R_{e,x} - R_{f,x} = 0 \hs R_{e,y} - R_{f,y} - W_{ef} = 0 \]
+For link FG:
+\[ R_{f,x} - R_{g,x} = 0 \hs R_{f,y} - R_{g,y} - W_{fg} - W_{\text{art}} = 0 \]
+
+\subsubsection{Dynamic Equilibrium}%
+\label{eqns.forces-moments.dynamic}
+
 \subsection{Mass Calculations}%
 \label{eqns.masses}
 
@@ -181,7 +202,7 @@ By inspection of the PMKS+ model, we see that the output link completes one cycl
 \[ \omega_{1} = \omega_{5} \]
 The output link delivers one part per revolution, so the output link angular velocity is:
 \[ \omega_{5} = \frac{2\pi}{p^{-1}}\cdot \text{1 part}  \]
-\[ \Rightarrow \omega_{1} = 21.25 \text{rad}/\text{s} \]
+\[ \Rightarrow \omega_{1} = 1.86 \text{rad}/\text{s} \]
 
 \subsubsection{Acceleration}%
 \label{eqns.kinematics.acceleration}

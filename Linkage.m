@@ -34,14 +34,83 @@ classdef Linkage
             obj.l1 = Crank("1", 0.5726, 1, 1, [obj.jA obj.jB]);
             obj.l2 = Link("2", 1.4157, 1, 1, [obj.jB obj.jC]);
             obj.l3 = Link("3", 2.4866, 1, 1, [obj.jD, obj.jC, obj.jE]);
-            obj.l4 = Link("4", 1.1754, 1, 1, [obj.jE, obj.jF]);
-            obj.l5 = Link("5", 2.5841, 1, 1, [obj.jG, obj.jF]);
+            obj.l4 = Link("4", 1.1754, 1, 1, [obj.jE obj.jF]);
+            obj.l5 = Link("5", 2.5841, 1, 1, [obj.jG obj.jF]);
             obj.crank = obj.l1;
+            % obj.links = [obj.crank obj.l2 obj.l3 obj.l4 obj.l5];
 
             obj.plots = plots;
         end
 
-        function analyze(obj)
+        function analyzeStatics(obj)
+            AB = struct();
+            BC = struct();
+            EF = struct();
+            FG = struct();
+            CDE = struct();
+
+            syms ax ay bx by cx cy dx dy ex ey fx fy gx gy;
+
+            ABax  = ax;
+            ABbx  = bx;
+            ABay  = ay;
+            ABby  = by;
+            BCbx  = -1 * bx;
+            BCby  = -1 * by;
+            BCcx  = cx;
+            BCcy  = cy;
+            EFex  = ex;
+            EFey  = ey;
+            EFfx  = fx;
+            EFfy  = fy;
+            FGfx  = -1 * fx;
+            FGfy  = -1 * fy;
+            FGgx  = gx;
+            FGgy  = gy;
+            CDEcx = -1 * cx;
+            CDEcy = -1 * cy;
+            CDEdx = dx;
+            CDEdy = dy;
+            CDEex = -1 * ex;
+            CDEey = -1 * ey;
+
+            ABx = ABax - ABbx == 0;
+            BCx = BCbx - BCcx == 0;
+            CDEx = CDEcx + CDEdx - CDEex == 0;
+            EFx = EFex - EFfx == 0;
+            FGx = FGfx - FGgx == 0;
+
+            [Wab, Wbc, Wcde, Wef, Wfg] = deal(1);
+            Wart = 1;
+            ABy = ABay - ABby - Wab == 0;
+            BCy = BCby - BCcy - Wbc == 0;
+            CDEy = CDEcy + CDEdy - CDEey - Wcde == 0;
+            EFy = EFey - EFfy - Wef == 0;
+            FGy = FGfy - FGgy - Wfg - Wart == 0;
+
+            syms Tin;
+            MAB = [0 0 Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
+                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [ABbx ABby 0]) == 0;
+            MBC = cross(obj.l2.jointToJointVector(obj.l2.com, obj.jB), [0 -obj.l2.weight 0]) -...
+                  cross(obj.l2.jointToJointVector(obj.jB, obj.jC), [BCcx BCcy 0]) == 0;
+            MCDE = cross(obj.l3.jointToJointVector(obj.l3.com, obj.jC), [0 -obj.l3.weight 0]) +...
+                  cross(obj.l3.jointToJointVector(obj.jE, obj.jC), [CDEex CDEey 0]) - ...
+                  cross(obj.l3.jointToJointVector(obj.jD, obj.jC), [CDEdx CDEdy 0]) == 0;
+            MEF = cross(obj.l4.jointToJointVector(obj.l4.com, obj.jE), [0 -obj.l4.weight 0]) -...
+                  cross(obj.l4.jointToJointVector(obj.jF, obj.jE), [EFfx EFfy 0]) == 0;
+            MFG = cross(obj.l5.jointToJointVector(obj.l5.com, obj.jG), [0 -obj.l5.weight 0]) -...
+                  cross(obj.l5.jointToJointVector(obj.jF, obj.jG), [FGfx FGfy 0]) == 0;
+
+            eqns = [ABx, BCx, CDEx, EFx, FGx, ABy, BCy, CDEy, EFy, FGy, MAB, MBC, MCDE, MEF, MFG];
+            v = [ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin];
+
+            soln = solve(eqns, v)
+            arrayfun(@double, table2array(struct2table(soln))')
+            % [0 0 soln.Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
+            %       cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [soln.bx soln.by 0])
+        end
+
+        function analyzeDynamics(obj)
             for i = obj.crank.START_ANGLE:obj.crank.STEP_ANGLE:obj.crank.END_ANGLE
                 % Update crank angle
                 obj.crank.incrementAngle(obj.crank.STEP_ANGLE);
