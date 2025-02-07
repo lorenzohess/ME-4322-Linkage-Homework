@@ -14,6 +14,7 @@ classdef Linkage
         l3
         l4
         l5
+        links
 
         % Pre-compute distance between jC and jE because computing during iteration
         % yields incorrect position analysis (error builds up in position of C).
@@ -34,12 +35,13 @@ classdef Linkage
             obj.jF = Joint("F", -0.98, 2.57, false, 'c.');
             obj.jG = Joint("G", 0.05, 0.2, true, 'k.');
 
-            obj.l1 = Crank("1", 0.5726, 8.35, 0.266, [obj.jA obj.jB], [1.535 0.7375 0]);
+            obj.l1 = Crank("1", 0.5726, 8.35, 0.266, [obj.jA obj.jB], [1.535 0.7375 0], 'k.');
             obj.crank = obj.l1;
-            obj.l2 = Link("2", 1.4157, 20.2, 3.528, [obj.jB obj.jC], [0.9624 1.0125 0]);
-            obj.l3 = Link("3", 2.4866, 34.85, 18.54, [obj.jD, obj.jC, obj.jE], [0.24 1.2975 0]);
-            obj.l4 = Link("4", 1.1754, 16.82, 2.05, [obj.jE obj.jF], [-0.465 1.385 0]);
-            obj.l5 = Link("5", 2.5841, 62.11, 103, [obj.jG obj.jF], [-0.3925 2.555 0]);
+            obj.l2 = Link("2", 1.4157, 20.2, 3.528, [obj.jB obj.jC], [0.9624 1.0125 0], 'r.');
+            obj.l3 = Link("3", 2.4866, 34.85, 18.54, [obj.jD, obj.jC, obj.jE], [0.24 1.2975 0], 'g.');
+            obj.l4 = Link("4", 1.1754, 16.82, 2.05, [obj.jE obj.jF], [-0.465 1.385 0], 'b.');
+            obj.l5 = Link("5", 2.5841, 62.11, 103, [obj.jG obj.jF], [-0.3925 2.555 0], 'c.');
+            obj.links = {obj.crank, obj.l2, obj.l3, obj.l4, obj.l5};
 
             obj.plots = plots;
         end
@@ -179,7 +181,8 @@ classdef Linkage
                 obj.updatePositions();
                 obj.updateAngularVelocities();
                 obj.computeAndPlotLinearVelocities();
-                % obj.updateAngularAccelerations();
+                obj.updateAngularAccelerations();
+                obj.updateCOMAccelerations();
             end
         end
 
@@ -214,20 +217,20 @@ classdef Linkage
         function updatePositions(obj)
         % Compute position of Joint B
             c = obj.crank.updateCoords();
-            plot(obj.plots.jointLinPos, c(1), c(2), obj.jB.color)
+            plot(obj.plots.linJointPos, c(1), c(2), obj.jB.color)
 
             % Compute position of Joint C
             c = obj.circleIntersection(obj.jC, obj.jB, obj.jD, obj.l2.length,...
                                        [obj.l3.jointToJointDistance(obj.jD, obj.jC)]);
-            plot(obj.plots.jointLinPos, c(1), c(2), obj.jC.color);
+            plot(obj.plots.linJointPos, c(1), c(2), obj.jC.color);
 
             % Compute position of Joint E
             c = obj.circleIntersection(obj.jE, obj.jC, obj.jD, obj.DISTANCE_JC_TO_JE, obj.l3.length);
-            plot(obj.plots.jointLinPos, c(1), c(2), obj.jE.color);
+            plot(obj.plots.linJointPos, c(1), c(2), obj.jE.color);
 
             % Compute position of Joint F
             c = obj.circleIntersection(obj.jF, obj.jG, obj.jE, obj.l5.length, obj.l4.length);
-            plot(obj.plots.jointLinPos, c(1), c(2), obj.jF.color);
+            plot(obj.plots.linJointPos, c(1), c(2), obj.jF.color);
         end
 
         function updateAngularVelocities(obj)
@@ -246,22 +249,41 @@ classdef Linkage
         end
 
         function computeAndPlotLinearVelocities(obj)
+            obj.l2.generateLegendInfo(obj.plots.linJointVelX);
+            obj.l3.generateLegendInfo(obj.plots.linJointVelX);
+            obj.l4.generateLegendInfo(obj.plots.linJointVelX);
+            obj.l5.generateLegendInfo(obj.plots.linJointVelX);
+
+            obj.l2.generateLegendInfo(obj.plots.linJointVelY);
+            obj.l3.generateLegendInfo(obj.plots.linJointVelY);
+            obj.l4.generateLegendInfo(obj.plots.linJointVelY);
+            obj.l5.generateLegendInfo(obj.plots.linJointVelY);
+
             % jB
             jBlinVel = obj.crank.getCurrentVelocity(obj.jA, obj.jB);
-            plot(obj.plots.jointLinVelX, obj.crank.angle, jBlinVel(1), obj.jB.color)
-            plot(obj.plots.jointLinVelY, obj.crank.angle, jBlinVel(2), obj.jB.color)
+            plot(obj.plots.linJointVelX, obj.crank.angle, jBlinVel(1), obj.jB.color)
+            plot(obj.plots.linJointVelY, obj.crank.angle, jBlinVel(2), obj.jB.color)
+
             % jC
             jClinVel = obj.l3.getCurrentVelocity(obj.jB, obj.jC);
-            plot(obj.plots.jointLinVelX, obj.crank.angle, jClinVel(1), obj.jC.color)
-            plot(obj.plots.jointLinVelY, obj.crank.angle, jClinVel(2), obj.jC.color)
+            plot(obj.plots.linJointVelX, obj.crank.angle, jClinVel(1), obj.jC.color)
+            plot(obj.plots.linJointVelY, obj.crank.angle, jClinVel(2), obj.jC.color)
+
             % jE
             jElinVel = obj.l4.getCurrentVelocity(obj.jB, obj.jE);
-            plot(obj.plots.jointLinVelX, obj.crank.angle, jElinVel(1), obj.jE.color)
-            plot(obj.plots.jointLinVelY, obj.crank.angle, jElinVel(2), obj.jE.color)
+            plot(obj.plots.linJointVelX, obj.crank.angle, jElinVel(1), obj.jE.color)
+            plot(obj.plots.linJointVelY, obj.crank.angle, jElinVel(2), obj.jE.color)
+
             % jF
             jFlinVel = obj.l5.getCurrentVelocity(obj.jB, obj.jF);
-            plot(obj.plots.jointLinVelX, obj.crank.angle, jFlinVel(1), obj.jF.color)
-            plot(obj.plots.jointLinVelY, obj.crank.angle, jFlinVel(2), obj.jF.color)
+            plot(obj.plots.linJointVelX, obj.crank.angle, jFlinVel(1), obj.jF.color)
+            plot(obj.plots.linJointVelY, obj.crank.angle, jFlinVel(2), obj.jF.color)
+
+            legend(obj.plots.linJointVelX, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            legend(obj.plots.linJointVelY, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
         end
 
         function updateAngularAccelerations(obj)
@@ -274,23 +296,75 @@ classdef Linkage
             obj.l3.angularAcceleration = soln.alpha3;
             obj.l4.angularAcceleration = soln.alpha4;
             obj.l5.angularAcceleration = soln.alpha5;
+
             obj.plotLinkAngularAccelerations();
         end
 
+        function updateCOMAccelerations(obj)
+            for i = 1:length(obj.links)
+                link = obj.links{i};
+                if ~isempty(link.groundJoint)
+                    % If grounded, call the typical method
+                    link.COMAcceleration = link.computeCOMGroundedAcceleration();
+                end
+            end
+            % HACK: do BC and EF hardcoded
+            accCOMToB = obj.l2.computeCOMToJointAcceleration(obj.jB);
+            accBToA = obj.l2.computeJointToJointAcceleration(obj.jA, obj.jB);
+            obj.l2.COMAcceleration = accCOMToB + accBToA;
+
+            accCOMToF = obj.l4.computeCOMToJointAcceleration(obj.jF);
+            accFToG = obj.l4.computeJointToJointAcceleration(obj.jG, obj.jG);
+            obj.l4.COMAcceleration = accCOMToF + accFToG;
+
+            obj.plotCOMAccelerations()
+        end
+
+        %%% Plotting
         function plotLinkAngularVelocities(obj)
-            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l2.angularVelocity, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
-            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l3.angularVelocity, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
-            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l4.angularVelocity, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
-            plot(obj.plots.linkAngVel, obj.crank.angle, obj.l5.angularVelocity, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
-            ylim([-5 5])
+            obj.l2.generateLegendInfo(obj.plots.angLinkVel);
+            obj.l3.generateLegendInfo(obj.plots.angLinkVel);
+            obj.l4.generateLegendInfo(obj.plots.angLinkVel);
+            obj.l5.generateLegendInfo(obj.plots.angLinkVel);
+
+            % Empty points to make legend not give legend Series for each point plotted after
+            plot(obj.plots.angLinkVel, obj.crank.angle, obj.l2.angularVelocity, obj.l2.plotFormat)
+            plot(obj.plots.angLinkVel, obj.crank.angle, obj.l3.angularVelocity, obj.l3.plotFormat)
+            plot(obj.plots.angLinkVel, obj.crank.angle, obj.l4.angularVelocity, obj.l4.plotFormat)
+            plot(obj.plots.angLinkVel, obj.crank.angle, obj.l5.angularVelocity, obj.l5.plotFormat)
+
+            legend(obj.plots.angLinkVel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
         end
 
         function plotLinkAngularAccelerations(obj)
-            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l2.angularAcceleration, 'r.', 'DisplayName', "Link " + num2str(obj.l2.num))
-            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l3.angularAcceleration, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
-            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l4.angularAcceleration, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
-            plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l5.angularAcceleration, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
-            ylim([-10 10])
+            obj.l2.generateLegendInfo(obj.plots.angLinkAccel);
+            obj.l3.generateLegendInfo(obj.plots.angLinkAccel);
+            obj.l4.generateLegendInfo(obj.plots.angLinkAccel);
+            obj.l5.generateLegendInfo(obj.plots.angLinkAccel);
+
+            plot(obj.plots.angLinkAccel, obj.crank.angle, obj.l2.angularAcceleration, obj.l2.plotFormat)
+            plot(obj.plots.angLinkAccel, obj.crank.angle, obj.l3.angularAcceleration, obj.l3.plotFormat)
+            plot(obj.plots.angLinkAccel, obj.crank.angle, obj.l4.angularAcceleration, obj.l4.plotFormat)
+            plot(obj.plots.angLinkAccel, obj.crank.angle, obj.l5.angularAcceleration, obj.l5.plotFormat)
+
+            legend(obj.plots.angLinkAccel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+        end
+
+        function plotCOMAccelerations(obj)
+            obj.l2.generateLegendInfo(obj.plots.linCOMAccel);
+            obj.l3.generateLegendInfo(obj.plots.linCOMAccel);
+            obj.l4.generateLegendInfo(obj.plots.linCOMAccel);
+            obj.l5.generateLegendInfo(obj.plots.linCOMAccel);
+
+            plot(obj.plots.linCOMAccel, obj.crank.angle, obj.l2.COMAcceleration(1), obj.l2.plotFormat)
+            plot(obj.plots.linCOMAccel, obj.crank.angle, obj.l3.COMAcceleration(1), obj.l3.plotFormat)
+            plot(obj.plots.linCOMAccel, obj.crank.angle, obj.l4.COMAcceleration(1), obj.l4.plotFormat)
+            plot(obj.plots.linCOMAccel, obj.crank.angle, obj.l5.COMAcceleration(1), obj.l5.plotFormat)
+
+            legend(obj.plots.angLinkAccel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
         end
     end
 end

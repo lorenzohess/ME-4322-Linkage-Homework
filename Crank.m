@@ -4,13 +4,13 @@ classdef Crank < Link
         START_ANGLE = 1; % degree
         END_ANGLE = 360; % degree
         STEP_ANGLE = 1; % degree
-        INPUT_ANGULAR_VELOCITY = 1.86; % rad/s
+        INPUT_ANGULAR_VELOCITY = -1.86; % rad/s
         INPUT_ANGULAR_ACCELERATION = 0; % rad/s/s
     end
 
     methods
-        function obj = Crank(num, length, mass, mmi, joints, comCoords)
-            obj@Link(num, length, mass, mmi, joints, comCoords);
+        function obj = Crank(num, length, mass, mmi, joints, comCoords, plotFormat)
+            obj@Link(num, length, mass, mmi, joints, comCoords, plotFormat);
             obj.angularVelocity = obj.INPUT_ANGULAR_VELOCITY;
             obj.symAngularVelocity = obj.INPUT_ANGULAR_VELOCITY;
             obj.angularAcceleration = obj.INPUT_ANGULAR_ACCELERATION;

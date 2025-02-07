@@ -11,12 +11,16 @@ classdef Link < handle
         num % integer ID, e.g. 1
         comVectorsStruct
         comCoords
+        plotFormat
+        hSeries
+        seriesName
     end
 
     properties
         angle % degrees
         angularVelocity = 0; % initial
         angularAcceleration = 0; % initial
+        COMAcceleration = [];
         symAngularVelocity sym
         symAngularAcceleration sym
         symRx
@@ -25,7 +29,7 @@ classdef Link < handle
 
     methods
         % Constructor
-        function obj = Link(num, length, mass, mmi, joints, comCoords)
+        function obj = Link(num, length, mass, mmi, joints, comCoords, plotFormat)
             obj.num = num;
             obj.length = length;
             obj.mass = mass;
@@ -36,6 +40,7 @@ classdef Link < handle
             obj.assignGround();
             obj.comCoords = comCoords;
             obj.comVectorsStruct = obj.computeJointToCOMVectors();
+            obj.plotFormat = plotFormat;
 
             omega = sym("omega" + num2str(obj.num));
             obj.symAngularVelocity = omega;
@@ -44,6 +49,11 @@ classdef Link < handle
             obj.symAngularAcceleration = alpha;
 
             % Rx = sym("Rx" + num2str(obj.num));
+        end
+
+        function generateLegendInfo(obj, ax)
+            obj.seriesName = "Link " + obj.num;
+            obj.hSeries = plot(ax, NaN, NaN, obj.plotFormat, 'DisplayName', obj.seriesName);
         end
 
         function comVector = jointToCOMVector(obj, joint)
@@ -65,6 +75,10 @@ classdef Link < handle
 
         function v = getCurrentAngularVelocityVector(obj)
             v = [0 0 obj.angularVelocity];
+        end
+
+        function v = getCurrentAngularAccelerationVector(obj)
+            v = [0 0 obj.angularAcceleration];
         end
 
         function symAngularVelocityVector = getSymAngularVelocityVector(obj)
@@ -122,6 +136,33 @@ classdef Link < handle
             normal = cross(obj.getSymAngularAccelerationVector(), [obj.jointToJointVector(jHead, jTail)]);
             tangential = cross(obj.getCurrentAngularVelocityVector(), obj.getCurrentVelocity(jTail, jHead));
             acceleration = normal + tangential;
+        end
+
+        function accJointToJointVector = computeJointToJointAcceleration(obj, jTail, jHead)
+        % HACK: also used for COM to Joint relative acceleration
+            jointToJointVector = obj.jointToJointVector(jHead, jTail);
+            angVel = obj.getCurrentAngularVelocityVector();
+
+            accTangential = cross(obj.getCurrentAngularAccelerationVector(), jointToJointVector);
+            accNormal = cross(angVel,...
+                            cross(angVel, jointToJointVector));
+            accJointToJointVector = accTangential + accNormal;
+        end
+
+        function accCOMToJointVector = computeCOMToJointAcceleration(obj, joint)
+        % Compute accel of COM wrto. joint
+            jointToCOM = obj.jointToCOMVector(joint);
+            angVel = obj.getCurrentAngularVelocityVector();
+
+            accTangential = cross(obj.getCurrentAngularAccelerationVector(), jointToCOM);
+            accNormal = cross(angVel,...
+                            cross(angVel, jointToCOM));
+            accCOMToJointVector = accTangential + accNormal;
+        end
+
+        function accCOMGroundedVector = computeCOMGroundedAcceleration(obj)
+        % Compute accel of COM wrto. ground joint
+            accCOMGroundedVector = obj.computeCOMToJointAcceleration(obj.groundJoint);
         end
 
         function assignGround(obj)

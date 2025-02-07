@@ -131,11 +131,27 @@
 
 \begin{enumerate}
         \item Steady-state rate of 7450 parts in seven hours
+        \item Links made of 7075 Aluminum
 \end{enumerate}
 
+\section{Schematics}%
+\label{schematics}
 
-\section{Free-Body Diagrams}%
-\label{fbds}
+The kinematic outline of the six-bar linkage is shown in Figure \ref{fig:kin-outline}. Recall that link FG extends beyond joint F to accommodate a gripper.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.25]{../kinematic-outline.jpeg}
+  \caption{\label{fig:kin-outline}Kinematic outline of the linkage.}
+\end{figure}
+
+A free-body diagram of each link is shown in Figure \ref{fig:fbds}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{../fbds.jpeg}
+  \caption{\label{fig:fbs}Free-body diagram of each link.}
+\end{figure}
 
 \section{Statics and Dynamics Equations}%
 \label{eqns}
@@ -150,19 +166,25 @@ At static equilibrium, the net force and moment on each link is zero. Figures \r
 
 Each link yields one vector force equations; link AB also yields one vector moment equation. All force equations have two components, and the moment equation has three components.
 
-For link AB, with moments summed at point $A$:
-\[ R_{a,x} - R_{b,x} = 0 \hs R_{a,y} - R_{b,y} - W_{ab} = 0 \hs \vec{\tau}_{in} - \vec{r}_{s/a}\times \vec{W}_{ab} - \vec{r}_{b/a}\times \vec{R}_{b} \]
-For link BC:
-\[ R_{b,x} - R_{c,x} = 0 \hs R_{b,y} - R_{c,y} - W_{bc} = 0 \]
-For link CDE:
-\[ R_{d,x} + R_{c,x} - R_{e,x} = 0 \hs R_{d,y} + R_{c,y} - R_{e,y} - W_{cde} = 0 \]
-For link EF:
-\[ R_{e,x} - R_{f,x} = 0 \hs R_{e,y} - R_{f,y} - W_{ef} = 0 \]
-For link FG:
-\[ R_{f,x} - R_{g,x} = 0 \hs R_{f,y} - R_{g,y} - W_{fg} - W_{\text{art}} = 0 \]
+For link AB, with moments about joint A:
+\[ R_{a,x} - R_{b,x} = 0 \hs -R_{a,y} + R_{b,y} - W_{ab} = 0 \hs \vec{\tau}_{in} + \vec{r}_{s/a}\times \vec{W}_{ab} + \vec{r}_{b/a}\times \vec{R}_{b} = 0 \]
+For link BC, with moments about joint B:
+\[ R_{b,x} - R_{c,x} = 0 \hs -R_{b,y} + R_{c,y} - W_{bc} = 0 \hs \vec{r}_{s/b}\times \vec{W}_{bc} + \vec{r}_{c/b}\times \vec{R}_{c} = 0 \]
+For link CDE, with moments about joint C:
+\[ R_{d,x} - R_{c,x} - R_{e,x} = 0 \hs R_{d,y} - R_{c,y} - R_{e,y} - W_{cde} = 0 \hs \vec{r}_{s/c}\times \vec{W}_{cde} + \vec{r}_{e/c}\times \vec{R}_{e} + \vec{r}_{d/c}\times \vec{R}_{d} = 0 \]
+For link EF, with moments about joint E:
+\[ R_{e,x} - R_{f,x} = 0 \hs -R_{e,y} + R_{f,y} - W_{ef} = 0 \hs \vec{r}_{s/e}\times \vec{W}_{ef} + \vec{r}_{f/e}\times \vec{R}_{f} = 0 \]
+For link FG, with moments about joint G:
+\[ R_{f,x} - R_{g,x} = 0 \hs -R_{f,y} + R_{g,y} - W_{fg} - W_{\text{art}} = 0 \hs \vec{r}_{s/g}\times \vec{W}_{fg} + \vec{r}_{f/g}\times \vec{R}_{f} + \vec{r}_{\text{art}/g}\times \vec{W}_{\text{art}} = 0 \]
 
 \subsubsection{Dynamic Equilibrium}%
 \label{eqns.forces-moments.dynamic}
+
+The dynamic equilibrium for each link is given by Newton's Second Law at the center of mass:
+\[ \Sigma \vec{F} = M \vec{a}_{s} \]
+For rotational dynamics:
+\[ \Sigma \vec{T} = J \vec{\alpha} \]
+We will compute the net force and torque on each link by computing $M \vec{a}_{s}$ or $J \vec{\alpha}$ after having calculated the respective accelerations.
 
 \subsection{Mass Calculations}%
 \label{eqns.masses}
@@ -251,10 +273,14 @@ Written compactly, the acceleration loop equations are thus:
 \[ \Sigma (\vec{\alpha}_{j/i}\times \vec{r}_{j/i}) +  \omega_{j/i}\times (\omega_{j/i}\times \vec{r}_{j/i}) \text{ for } i,j \cap \{(a,b),(b,c),(c,d),(d,a)\} \]
 \[ \Sigma (\vec{\alpha}_{j/i}\times \vec{r}_{j/i}) +  \omega_{j/i}\times (\omega_{j/i}\times \vec{r}_{j/i}) \text{ for } i,j \cap \{(d,e),(e,f),(f,g),(g,d)\} \]
 
-\subsection{Accelerations at CMs}%
+\subsection{Accelerations at COMs}%
 \label{eqns.accels}
 
-The acceleration at the center of mass of a link
+The acceleration at the center of mass of a link is defined with respect to a grounded joint. For link $ij$ with ground joint $j$:
+\[ \vec{a}_{s,ij} \equiv \vec{a}_{s,ij/j} = \vec{\alpha}_{ij} \times \vec{r}_{s,ij/j} + \vec{\omega}_{ij}\times \langle \vec{\omega}_{ij} , \vec{r}_{s,ij/j} \rangle \]
+For a non-grounded link $ik$ sharing a joint $i$ with grounded link $ij$, the acceleration must be decomposed relative to $i$ before relative to the ground joint $j$:
+\[ \vec{a}_{s,ik} \equiv \vec{a}_{s,ik/j} = \vec{a}_{s,ik/i} + \vec{a}_{i/j} \]
+where $\vec{a}_{s,ik/i}$ and $\vec{a}_{i/j}$ are both of the form described above for a grounded joint.
 
 \section{Results}%
 \label{res}
@@ -277,8 +303,105 @@ The acceleration at the center of mass of a link
 \subsection{Comparison with PMKS+}%
 \label{res.compare}
 
+\subsubsection{Joint Position}%
+\label{res.compare.linJointPos}
+
+Comparison of the linear joint positions is shown in Figure \ref{fig:compare.linJointPos}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Positions for ground joints are trivial (joint coordinates).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.5]{../matlab-plots/linJointPos.png}%
+  \includegraphics[scale=0.25]{../pmks-plots/linJointPos.png}
+  \caption{\label{fig:compare.linJointPos}Linear joint position comparison: my results (left) and PMKS+ (right).}
+\end{figure}
+
+\subsubsection{Joint Velocity}%
+\label{res.compare.linJointVel}
+
+Comparison of the linear joint velocities is shown in Figure \ref{fig:compare.linJointVel}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Velocities for ground joints are trivial (zero).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.5]{../matlab-plots/linJointVelX.png}%
+  \includegraphics[scale=0.5]{../matlab-plots/linJointVelY.png}\\
+
+  \includegraphics[scale=0.45]{../pmks-plots/linJointVel/linJointVelB.png}%
+  \includegraphics[scale=0.45]{../pmks-plots/linJointVel/linJointVelC.png}
+
+  \includegraphics[scale=0.45]{../pmks-plots/linJointVel/linJointVelE.png}%
+  \includegraphics[scale=0.45]{../pmks-plots/linJointVel/linJointVelF.png}%
+  \caption{\label{fig:compare.linJointVel}Linear joint velocity comparison: my results (above) and PMKS+ (below).}
+\end{figure}
+
+\subsubsection{Joint Acceleration}%
+\label{res.compare.linJointAcc}
+
+Comparison of the joint accelerations is shown in Figure \ref{fig:compare.linJointAcc}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Accelerations for ground joints are trivial (zero).
+
+\begin{figure}[ht]
+  \centering
+  % \includegraphics[scale=0.5]{../matlab-plots/linJointAccX.png}%
+  % \includegraphics[scale=0.5]{../matlab-plots/linJointAccY.png}\\
+
+  \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccB.png}%
+  \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccC.png}
+
+  \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccE.png}%
+  \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccF.png}%
+  \caption{\label{fig:compare.linJointAcc}Linear joint acceleration comparison: my results (above) and PMKS+ (below).}
+\end{figure}
+
+\subsubsection{Link Angular Velocity}%
+\label{res.compare.angLinkVel}
+
+Comparison of the link angular velocity is shown in Figure \ref{fig:compare.angLinkVel}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Angular velocity for the crank is trivial ($\omega_{\text{in}}$).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.5]{../matlab-plots/angLinkVel.png}
+
+  BC \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelCB.png}%
+  CDE \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelCDE.png}
+
+  EF \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelEF.png}%
+  FG \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelFG.png}%
+  \caption{\label{fig:compare.angLinkVel}Link angular velocity comparison: my results (above) and PMKS+ (below).}
+\end{figure}
+
+\subsubsection{Link Angular Acceleration}%
+\label{res.compare.angLinkAcc}
+
+Comparison of the link angular acceleration is shown in Figure \ref{fig:compare.angLinkAcc}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Angular acceleration for the crank is trivial (zero).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.5]{../matlab-plots/angLinkAccel.png}
+
+  BC \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccBC.png}%
+  CDE \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccCDE.png}
+
+  EF \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccEF.png}%
+  FG \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccFG.png}%
+  \caption{\label{fig:compare.angLinkAcc}Link angular acceleration comparison: my results (above) and PMKS+ (below).}
+\end{figure}
+
+
 \section{MATLAB Code}%
 \label{code}
+
+I have employed object-oriented programming to manage state across a single event loop for computing dynamic kinematic and kinetic variables. The Link and Joint classes form the basic elements of the linkage, and the Linkage class is instantiated a single time and comprises the linkage itself. Given that I have not ended up abstracting further into classes such as TernaryLink and implementing functionality to, for example, define kinematic loops, many hacks and inefficiencies are present in this program. Coding this was quite interesting, as it got me thinking about the mechanical state of an entire linkage. This was also more exciting than having a bunch of structs and independent scripts.
+
+\subsection{\texttt{linkage\_analysis.m}}%
+
+\subsection{\texttt{Linkage.m}}%
+
+\subsection{\texttt{Link.m}}%
+
+\subsection{\texttt{Crank.m}}%
+
+\subsection{\texttt{Joint.m}}%
+
+\subsection{\texttt{compute\_coords.m}}%
 
 \section{Discussion}%
 \label{discuss}
