@@ -19,7 +19,9 @@ classdef Linkage
         % yields incorrect position analysis (error builds up in position of C).
         DISTANCE_JC_TO_JE = 1.506195538434502;
 
+        Wart = 200; % Newtons
         artifactVector = [-1.225 6.830 0];
+
         plots
     end
     methods
@@ -44,13 +46,7 @@ classdef Linkage
         end
 
         function analyzeStatics(obj)
-            AB = struct();
-            BC = struct();
-            EF = struct();
-            FG = struct();
-            CDE = struct();
-
-            syms ax ay bx by cx cy dx dy ex ey fx fy gx gy;
+            syms ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin;
 
             ABax  = ax;
             ABbx  = bx;
@@ -81,31 +77,38 @@ classdef Linkage
             EFx = EFex - EFfx == 0;
             FGx = FGfx - FGgx == 0;
 
-            [Wab, Wbc, Wcde, Wef, Wfg] = deal(1);
-            Wart = 1;
-            ABy = ABay - ABby - Wab == 0;
-            BCy = BCby - BCcy - Wbc == 0;
-            CDEy = CDEcy + CDEdy - CDEey - Wcde == 0;
-            EFy = EFey - EFfy - Wef == 0;
-            FGy = FGfy - FGgy - Wfg - Wart == 0;
+            ABy = ABay - ABby - obj.crank.weight == 0;
+            BCy = BCby - BCcy - obj.l2.weight == 0;
+            CDEy = CDEcy + CDEdy - CDEey - obj.l3.weight == 0;
+            EFy = EFey - EFfy - obj.l4.weight == 0;
+            FGy = FGfy + FGgy - obj.l5.weight - obj.Wart == 0;
 
-            syms Tin;
-            MAB = [0 0 Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
-                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [ABbx ABby 0]) == 0;
-            MBC = cross(obj.l2.jointToJointVector(obj.l2.com, obj.jB), [0 -obj.l2.weight 0]) -...
-                  cross(obj.l2.jointToJointVector(obj.jB, obj.jC), [BCcx BCcy 0]) == 0;
-            MCDE = cross(obj.l3.jointToJointVector(obj.l3.com, obj.jC), [0 -obj.l3.weight 0]) +...
-                  cross(obj.l3.jointToJointVector(obj.jE, obj.jC), [CDEex CDEey 0]) - ...
+            % About A
+            MAB = [0 0 Tin] + cross(obj.crank.jointToCOMVector(obj.jA), [0 -obj.crank.weight 0]) +...
+                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx -ABby 0]) == 0;
+
+            % About B
+            MBC = cross(obj.l2.jointToCOMVector(obj.jB), [0 -obj.l2.weight 0]) +...
+                  cross(obj.l2.jointToJointVector(obj.jC, obj.jB), [-BCcx -BCcy 0]) == 0;
+
+            % About C
+            MCDE = cross(obj.l3.jointToCOMVector(obj.jC), [0 -obj.l3.weight 0]) +...
+                  cross(obj.l3.jointToJointVector(obj.jE, obj.jC), [-CDEex -CDEey 0]) + ...
                   cross(obj.l3.jointToJointVector(obj.jD, obj.jC), [CDEdx CDEdy 0]) == 0;
-            MEF = cross(obj.l4.jointToJointVector(obj.l4.com, obj.jE), [0 -obj.l4.weight 0]) -...
-                  cross(obj.l4.jointToJointVector(obj.jF, obj.jE), [EFfx EFfy 0]) == 0;
-            MFG = cross(obj.l5.jointToJointVector(obj.l5.com, obj.jG), [0 -obj.l5.weight 0]) -...
-                  cross(obj.l5.jointToJointVector(obj.jF, obj.jG), [FGfx FGfy 0]) == 0;
+
+            % About E
+            MEF = cross(obj.l4.jointToCOMVector(obj.jE), [0 -obj.l4.weight 0]) +...
+                  cross(obj.l4.jointToJointVector(obj.jF, obj.jE), [-EFfx -EFfy 0]) == 0;
+
+            % About G
+            MFG = cross(obj.l5.jointToCOMVector(obj.jG), [0 -obj.l5.weight 0]) +...
+                  cross(obj.l5.jointToJointVector(obj.jF, obj.jG), [FGfx FGfy 0]) +...
+                  cross(obj.l5.jointToJointVector(obj.artifactVector, obj.jG), [0 -obj.Wart 0]) == 0;
 
             eqns = [ABx, BCx, CDEx, EFx, FGx, ABy, BCy, CDEy, EFy, FGy, MAB, MBC, MCDE, MEF, MFG];
-            v = [ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin];
+            vars = [ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin];
 
-            soln = solve(eqns, v)
+            soln = solve(eqns, vars);
             arrayfun(@double, table2array(struct2table(soln))')
             % [0 0 soln.Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
             %       cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [soln.bx soln.by 0])

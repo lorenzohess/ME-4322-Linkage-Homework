@@ -151,6 +151,10 @@ classdef Link < handle
             end
         end
 
+        function v = jointToCOMVector(obj, joint)
+            v = obj.jointToJointVector(obj.com, joint);
+        end
+
         function distance = jointToJointDistance(obj, j1, j2)
             distance = sqrt((j1.x - j2.x)^2 + (j1.y - j2.y)^2);
         end
