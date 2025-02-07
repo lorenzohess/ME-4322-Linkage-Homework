@@ -167,8 +167,46 @@ For link FG:
 \subsection{Mass Calculations}%
 \label{eqns.masses}
 
-\subsection{Mass Moment of Inertia Calculations}%
-\label{eqns.mmi}
+All links were modeled in Onshape with material of Aluminum 7075. For all binary links, the centroid of the flat face is placed at the origin and the extrude is symmetric to ensure the center of mass also coincides with the origin. Link FG was extended by 1.843m beyond joint F and uses a similar rounded end with a pin for the gripper. For link CDE, joint D is placed at the origin and joint C at 0.98m distance.  Link AB is shown as an example in Figure \ref{fig:link-AB-CAD}. The joint-to-joint center distance was varied to produce different links. The mass properties are computed with Onshape's ``Mass and Section Properties'' feature and are in Table \ref{tab:link-masses}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.05]{../link-AB-CAD.png}
+  \caption{\label{fig:link-AB-CAD}Link AB modeled in Onshape.}
+\end{figure}
+
+\begin{table}[H] % put here, requires float package
+  \begin{center}
+    \begin{tabular}{ c|c }  % | for vertical lines
+    Link & Mass (\text{kg})   \\
+    \hline % for horizontal lines
+    AB & 8.35   \\
+    BC & 20.2   \\
+    CDE & 34.85   \\
+    EF &  16.82  \\
+    FG &  62.11  \\
+    \end{tabular}
+  \end{center}\caption{Link masses.}\label{tab:link-masses}
+\end{table}
+
+% \subsection{Mass Moment of Inertia Calculations}%
+% \label{eqns.mmi}
+
+The mass moments of inertia are given by Onshape's ``Mass and Section Properties'' feature mentioned in Section \ref{eqns.masses}, and are shown in Table \ref{tab:link-mmi}. The MMI is about the axis formed by the intersection of the Front and Top planes in Figure \ref{fig:link-AB-CAD}.
+
+\begin{table}[H] % put here, requires float package
+  \begin{center}
+    \begin{tabular}{ c|c }  % | for vertical lines
+      Link & MMI (kg$\cdot$m$^{2}$) \\
+      \hline
+      AB & 0.266   \\
+      BC & 3.53   \\
+      CDE & 18.54   \\
+      EF & 2.05 \\
+      FG & 103 \\
+    \end{tabular}
+  \end{center}\caption{Link mass moments of inertia.}\label{tab:link-mmi}
+\end{table}
 
 \subsection{Kinematics Equations}%
 \label{eqns.kinematics}
