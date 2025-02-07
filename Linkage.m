@@ -19,6 +19,7 @@ classdef Linkage
         % yields incorrect position analysis (error builds up in position of C).
         DISTANCE_JC_TO_JE = 1.506195538434502;
 
+        artifactVector = [-1.225 6.830 0];
         plots
     end
     methods
