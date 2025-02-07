@@ -20,7 +20,7 @@ classdef Linkage
         DISTANCE_JC_TO_JE = 1.506195538434502;
 
         Wart = 200; % Newtons
-        artifactVector = [-1.225 6.830 0];
+        artifactVector = [-1.225 3.450 0];
 
         plots
     end
@@ -70,21 +70,21 @@ classdef Linkage
             CDEex = -1 * ex;
             CDEey = -1 * ey;
 
-            ABx = ABax - ABbx == 0;
-            BCx = BCbx - BCcx == 0;
+            ABx = ABax + ABbx == 0;
+            BCx = -BCbx + BCcx == 0;
             CDEx = CDEcx + CDEdx - CDEex == 0;
-            EFx = EFex - EFfx == 0;
-            FGx = FGfx - FGgx == 0;
+            EFx = -EFex + EFfx == 0;
+            FGx = -FGfx + FGgx == 0;
 
-            ABy = ABay - ABby - obj.crank.weight == 0;
-            BCy = BCby - BCcy - obj.l2.weight == 0;
+            ABy = ABay + ABby - obj.crank.weight == 0;
+            BCy = -BCby + BCcy - obj.l2.weight == 0;
             CDEy = CDEcy + CDEdy - CDEey - obj.l3.weight == 0;
-            EFy = EFey - EFfy - obj.l4.weight == 0;
-            FGy = FGfy + FGgy - obj.l5.weight - obj.Wart == 0;
+            EFy = -EFey + EFfy - obj.l4.weight == 0;
+            FGy = -FGfy + FGgy - obj.l5.weight - obj.Wart == 0;
 
             % About A
             MAB = [0 0 Tin] + cross(obj.crank.jointToCOMVector(obj.jA), [0 -obj.crank.weight 0]) +...
-                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx -ABby 0]) == 0;
+                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx +ABby 0]) == 0;
 
             % About B
             MBC = cross(obj.l2.jointToCOMVector(obj.jB), [0 -obj.l2.weight 0]) +...
@@ -107,7 +107,7 @@ classdef Linkage
             eqns = [ABx, BCx, CDEx, EFx, FGx, ABy, BCy, CDEy, EFy, FGy, MAB, MBC, MCDE, MEF, MFG];
             vars = [ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin];
 
-            soln = solve(eqns, vars);
+            soln = solve(eqns, vars)
             arrayfun(@double, table2array(struct2table(soln))')
             % [0 0 soln.Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
             %       cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [soln.bx soln.by 0])
@@ -174,9 +174,9 @@ classdef Linkage
 
         function updateAngularVelocities(obj)
             loop1 = obj.crank.getSymVelocity() + obj.l2.getSymVelocity(obj.jB, obj.jC) +...
-                    obj.l3.getSymVelocity(obj.jC, obj.jD);
+                    obj.l3.getSymVelocity(obj.jC, obj.jD) == 0;
             loop2 = obj.l3.getSymVelocity(obj.jE) + obj.l4.getSymVelocity(obj.jE, obj.jF) +...
-                    obj.l5.getSymVelocity(obj.jF, obj.jG);
+                    obj.l5.getSymVelocity(obj.jF, obj.jG) == 0;
 
             soln = solve([loop1, loop2], [obj.l2.symAngularVelocity, obj.l3.symAngularVelocity,...
                                           obj.l4.symAngularVelocity, obj.l5.symAngularVelocity]);

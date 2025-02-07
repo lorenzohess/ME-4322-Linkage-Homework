@@ -9,6 +9,8 @@ classdef Link < handle
         groundJoint
         nonGroundJoints = [];
         num % integer ID, e.g. 1
+        comVectorsStruct
+        comCoords
     end
 
     properties
@@ -32,7 +34,8 @@ classdef Link < handle
             obj.joints = joints;
             obj.angle = obj.initialAngle();
             obj.assignGround();
-            obj.com = obj.computeCOM();
+            obj.comCoords = obj.computeCOMCoords();
+            obj.comVectorsStruct = obj.computeJointToCOMVectors();
 
             omega = sym("omega" + num2str(obj.num));
             obj.symAngularVelocity = omega;
@@ -43,11 +46,38 @@ classdef Link < handle
             % Rx = sym("Rx" + num2str(obj.num));
         end
 
-        function comVector = computeCOM(obj)
+        function comVector = jointToCOMVector(obj, joint)
+            comVector = obj.comVectorsStruct.(joint.name);
+        end
+
+        function comCoords = computeCOMCoords(obj)
+            % HACK: check if grounded
+            % Take one joint coords and add other joint coords / 2
             if length(obj.groundJoint) > 0
-                comVector = [obj.groundJoint.x, obj.groundJoint.x] + [obj.nonGroundJoints(1).x / 2, obj.nonGroundJoints(1).y / 2];
+                disp(obj.num)
+                comCoords = [obj.groundJoint.x obj.groundJoint.y 0] + [obj.nonGroundJoints(1).x / 2, obj.nonGroundJoints(1).y / 2, 0]
             else
-                comVector = [obj.nonGroundJoints(1).x, obj.nonGroundJoints(1).y] + [obj.nonGroundJoints(2).x / 2, obj.nonGroundJoints(2).y / 2];
+                disp(obj.num)
+                comCoords = [obj.nonGroundJoints(1).x obj.nonGroundJoints(1).y 0] + [obj.nonGroundJoints(2).x / 2 obj.nonGroundJoints(2).y / 2 0]
+            end
+            % HACK: if ternary, i.e. CDE, use hardcoded from Onshape
+            if 3 == length(obj.joints)
+                disp(obj.num)
+                % jD + distance 1.2463 away => COM of CDE at (0.32, 1.3)
+                comCoords = [0.32 1.3 0];
+            end
+            % HACK: if FG, use gripper as one endpoint
+            for joint = obj.joints
+                if joint.name == "G"
+                    comCoords = [obj.groundJoint.x obj.groundJoint.y 0] + [-1.225 / 2, 3.450 / 2, 0]
+                end
+            end
+        end
+
+        function comVectorsStruct = computeJointToCOMVectors(obj)
+            comVectorsStruct = struct();
+            for joint = obj.joints
+                comVectorsStruct.(joint.name) = obj.comCoords - [joint.getCoords() 0];
             end
         end
 
@@ -149,10 +179,6 @@ classdef Link < handle
             else
                 vector = [jHead(1) - jTail.x, jHead(2) - jTail.y, Z];
             end
-        end
-
-        function v = jointToCOMVector(obj, joint)
-            v = obj.jointToJointVector(obj.com, joint);
         end
 
         function distance = jointToJointDistance(obj, j1, j2)
