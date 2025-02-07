@@ -3,16 +3,17 @@ clc; clear; format long;
 plots = initializePlots();
 
 linkage = Linkage(plots);
-linkage.analyzeStatics()
-% linkage.analyzeDynamics()
+% linkage.analyzeStatics()
+linkage.analyzeDynamics()
 
 function plots = initializePlots()
     % Set up figures
-    plots = struct('jointPos', {},...
+    plots = struct('jointLinPos', {},...
+                   'jointLinVelX', {},...
+                   'jointLinVelY', {},...
                    'linkAngVel', {},...
                    'linkAngAccel', {}...
                   );
-    % 'jointVel', {},...
     % 'jointAccel', {},...
     % 'accel', {},...
     % 'staticForce', {},...
@@ -24,13 +25,16 @@ function plots = initializePlots()
     plotNames = fieldnames(plots);
     plots = struct();
 
-    % for i = 1:numel(plotNames)
-    %     fieldName = plotNames{i};
-    %     figure('Name', fieldName);
-    %     plots.(fieldName) = axes;
-    %     hold(plots.(fieldName), 'on')
-    %     if (fieldName ~= "linkAngAccel")
-    %         axis(plots.(fieldName), 'equal')
-    %     end
-    % end
+    for i = 1:numel(plotNames)
+        fieldName = plotNames{i};
+        figure('Name', fieldName);
+        plots.(fieldName) = axes;
+        hold(plots.(fieldName), 'on')
+        if (fieldName ~= "linkAngAccel") | (fieldName ~= "linkAngVelX") | (fieldName ~= "linkAngVelY")
+            axis(plots.(fieldName), 'equal')
+        end
+        if (fieldName == "linkAngVelX") | (fieldName == "linkAngVelY")
+            axis(plots.(fieldName), 'tight')
+        end
+    end
 end

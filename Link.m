@@ -92,9 +92,9 @@ classdef Link < handle
         end
 
         function velocity = getCurrentVelocity(obj, jTail, jHead)
-        % Assumes position vector goes from tail ground joint to head non-ground
-        % joint, or if neither joint is grounded, then from tail joints(1) to
-        % head joints(2), unless headJoint is given, in which head is headJoint.
+        % HACK: Assumes position vector goes from tail ground joint to head
+        % non-ground joint, or if neither joint is grounded, then from tail
+        % joints(1) to head joints(2).
             if 1 == nargin % no args, ground -> non-ground, i.e. binary link
                 jTail = obj.groundJoint;
                 jHead = obj.nonGroundJoints(1);
@@ -108,10 +108,9 @@ classdef Link < handle
         end
 
         function acceleration = getSymAcceleration(obj, jTail, jHead)
-        % Assumes position vector goes from tail ground joint to head non-ground
-        % joint, or if neither joint is grounded, then from tail joints(1) to
-        % head joints(2), unless headJoint is given, in which head is headJoint.
-            % disp("Link: " + obj.num)
+        % HACK: Assumes position vector goes from tail ground joint to head
+        % non-ground joint, or if neither joint is grounded, then from tail
+        % joints(1) to head joints(2).
             if 1 == nargin % no args, ground -> non-ground, i.e. binary link
                 jTail = obj.groundJoint;
                 jHead = obj.nonGroundJoints(1);
@@ -126,7 +125,7 @@ classdef Link < handle
         end
 
         function assignGround(obj)
-        % Doesn't handle more than one ground joint per link
+        % HACK: Doesn't handle more than one ground joint per link
             for joint = obj.joints
                 if (joint.ground)
                     obj.groundJoint = joint;

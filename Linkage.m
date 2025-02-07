@@ -74,18 +74,21 @@ classdef Linkage
             FGgx  = gx;
             FGgy  = gy;
 
+            % Force in X
             ABx = ABax - ABbx == 0;
             BCx = BCbx - BCcx == 0;
             CDEx = CDEcx - CDEdx - CDEex == 0;
             EFx = EFex - EFfx == 0;
             FGx = FGfx - FGgx == 0;
 
+            % Force in Y
             ABy = -ABay + ABby - obj.crank.weight == 0;
             BCy = -BCby + BCcy - obj.l2.weight == 0;
             CDEy = -CDEcy + CDEdy - CDEey - obj.l3.weight == 0;
             EFy = -EFey + EFfy - obj.l4.weight == 0;
             FGy = -FGfy + FGgy - obj.l5.weight - obj.Wart == 0;
 
+            % Moments
             % About A
             MAB = [0 0 -Tin] + cross(obj.crank.jointToCOMVector(obj.jA), [0 -obj.crank.weight 0]) +...
                   cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx ABby 0]) == 0;
@@ -147,21 +150,21 @@ classdef Linkage
             expected_soln_Tin = -339.5618;
 
 
-            obj.compareSolns("ax", soln_ax, expected_soln_ax)
-            obj.compareSolns("ay", soln_ay, expected_soln_ay)
-            obj.compareSolns("bx", soln_bx, expected_soln_bx)
-            obj.compareSolns("by", soln_by, expected_soln_by)
-            obj.compareSolns("cx", soln_cx, expected_soln_cx)
-            obj.compareSolns("cy", soln_cy, expected_soln_cy)
-            obj.compareSolns("dx", soln_dx, expected_soln_dx)
-            obj.compareSolns("dy", soln_dy, expected_soln_dy)
-            obj.compareSolns("ex", soln_ex, expected_soln_ex)
-            obj.compareSolns("ey", soln_ey, expected_soln_ey)
-            obj.compareSolns("fx", soln_fx, expected_soln_fx)
-            obj.compareSolns("fy", soln_fy, expected_soln_fy)
-            obj.compareSolns("gx", soln_gx, expected_soln_gx)
-            obj.compareSolns("gy", soln_gy, expected_soln_gy)
-            obj.compareSolns("Tin", soln_Tin, expected_soln_Tin)
+            % obj.compareSolns("ax", soln_ax, expected_soln_ax)
+            % obj.compareSolns("ay", soln_ay, expected_soln_ay)
+            % obj.compareSolns("bx", soln_bx, expected_soln_bx)
+            % obj.compareSolns("by", soln_by, expected_soln_by)
+            % obj.compareSolns("cx", soln_cx, expected_soln_cx)
+            % obj.compareSolns("cy", soln_cy, expected_soln_cy)
+            % obj.compareSolns("dx", soln_dx, expected_soln_dx)
+            % obj.compareSolns("dy", soln_dy, expected_soln_dy)
+            % obj.compareSolns("ex", soln_ex, expected_soln_ex)
+            % obj.compareSolns("ey", soln_ey, expected_soln_ey)
+            % obj.compareSolns("fx", soln_fx, expected_soln_fx)
+            % obj.compareSolns("fy", soln_fy, expected_soln_fy)
+            % obj.compareSolns("gx", soln_gx, expected_soln_gx)
+            % obj.compareSolns("gy", soln_gy, expected_soln_gy)
+            % obj.compareSolns("Tin", soln_Tin, expected_soln_Tin)
         end
 
         function compareSolns(obj, s, mine, pmks)
@@ -175,8 +178,8 @@ classdef Linkage
 
                 obj.updatePositions();
                 obj.updateAngularVelocities();
-                obj.updateLinearVelocities();
-                obj.updateAngularAccelerations();
+                obj.computeAndPlotLinearVelocities();
+                % obj.updateAngularAccelerations();
             end
         end
 
@@ -211,20 +214,20 @@ classdef Linkage
         function updatePositions(obj)
         % Compute position of Joint B
             c = obj.crank.updateCoords();
-            plot(obj.plots.jointPos, c(1), c(2), obj.jB.color)
+            plot(obj.plots.jointLinPos, c(1), c(2), obj.jB.color)
 
             % Compute position of Joint C
             c = obj.circleIntersection(obj.jC, obj.jB, obj.jD, obj.l2.length,...
                                        [obj.l3.jointToJointDistance(obj.jD, obj.jC)]);
-            plot(obj.plots.jointPos, c(1), c(2), obj.jC.color);
+            plot(obj.plots.jointLinPos, c(1), c(2), obj.jC.color);
 
             % Compute position of Joint E
             c = obj.circleIntersection(obj.jE, obj.jC, obj.jD, obj.DISTANCE_JC_TO_JE, obj.l3.length);
-            plot(obj.plots.jointPos, c(1), c(2), obj.jE.color);
+            plot(obj.plots.jointLinPos, c(1), c(2), obj.jE.color);
 
             % Compute position of Joint F
             c = obj.circleIntersection(obj.jF, obj.jG, obj.jE, obj.l5.length, obj.l4.length);
-            plot(obj.plots.jointPos, c(1), c(2), obj.jF.color);
+            plot(obj.plots.jointLinPos, c(1), c(2), obj.jF.color);
         end
 
         function updateAngularVelocities(obj)
@@ -242,7 +245,23 @@ classdef Linkage
             obj.plotLinkAngularVelocities();
         end
 
-        function updateLinearVelocities(obj)
+        function computeAndPlotLinearVelocities(obj)
+            % jB
+            jBlinVel = obj.crank.getCurrentVelocity(obj.jA, obj.jB);
+            plot(obj.plots.jointLinVelX, obj.crank.angle, jBlinVel(1), obj.jB.color)
+            plot(obj.plots.jointLinVelY, obj.crank.angle, jBlinVel(2), obj.jB.color)
+            % jC
+            jClinVel = obj.l3.getCurrentVelocity(obj.jB, obj.jC);
+            plot(obj.plots.jointLinVelX, obj.crank.angle, jClinVel(1), obj.jC.color)
+            plot(obj.plots.jointLinVelY, obj.crank.angle, jClinVel(2), obj.jC.color)
+            % jE
+            jElinVel = obj.l4.getCurrentVelocity(obj.jB, obj.jE);
+            plot(obj.plots.jointLinVelX, obj.crank.angle, jElinVel(1), obj.jE.color)
+            plot(obj.plots.jointLinVelY, obj.crank.angle, jElinVel(2), obj.jE.color)
+            % jF
+            jFlinVel = obj.l5.getCurrentVelocity(obj.jB, obj.jF);
+            plot(obj.plots.jointLinVelX, obj.crank.angle, jFlinVel(1), obj.jF.color)
+            plot(obj.plots.jointLinVelY, obj.crank.angle, jFlinVel(2), obj.jF.color)
         end
 
         function updateAngularAccelerations(obj)
@@ -263,6 +282,7 @@ classdef Linkage
             plot(obj.plots.linkAngVel, obj.crank.angle, obj.l3.angularVelocity, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
             plot(obj.plots.linkAngVel, obj.crank.angle, obj.l4.angularVelocity, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
             plot(obj.plots.linkAngVel, obj.crank.angle, obj.l5.angularVelocity, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
+            ylim([-5 5])
         end
 
         function plotLinkAngularAccelerations(obj)
@@ -270,6 +290,7 @@ classdef Linkage
             plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l3.angularAcceleration, 'g.', 'DisplayName', "Link " + num2str(obj.l3.num))
             plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l4.angularAcceleration, 'b.', 'DisplayName', "Link " + num2str(obj.l4.num))
             plot(obj.plots.linkAngAccel, obj.crank.angle, obj.l5.angularAcceleration, 'c.', 'DisplayName', "Link " + num2str(obj.l5.num))
+            ylim([-10 10])
         end
     end
 end

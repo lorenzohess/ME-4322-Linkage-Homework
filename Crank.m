@@ -4,7 +4,7 @@ classdef Crank < Link
         START_ANGLE = 1; % degree
         END_ANGLE = 360; % degree
         STEP_ANGLE = 1; % degree
-        INPUT_ANGULAR_VELOCITY = 21.25; % rad/s
+        INPUT_ANGULAR_VELOCITY = 1.86; % rad/s
         INPUT_ANGULAR_ACCELERATION = 0; % rad/s/s
     end
 
