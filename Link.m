@@ -25,7 +25,7 @@ classdef Link < handle
 
     methods
         % Constructor
-        function obj = Link(num, length, mass, mmi, joints)
+        function obj = Link(num, length, mass, mmi, joints, comCoords)
             obj.num = num;
             obj.length = length;
             obj.mass = mass;
@@ -34,7 +34,7 @@ classdef Link < handle
             obj.joints = joints;
             obj.angle = obj.initialAngle();
             obj.assignGround();
-            obj.comCoords = obj.computeCOMCoords();
+            obj.comCoords = comCoords;
             obj.comVectorsStruct = obj.computeJointToCOMVectors();
 
             omega = sym("omega" + num2str(obj.num));
@@ -48,30 +48,6 @@ classdef Link < handle
 
         function comVector = jointToCOMVector(obj, joint)
             comVector = obj.comVectorsStruct.(joint.name);
-        end
-
-        function comCoords = computeCOMCoords(obj)
-            % HACK: check if grounded
-            % Take one joint coords and add other joint coords / 2
-            if length(obj.groundJoint) > 0
-                disp(obj.num)
-                comCoords = [obj.groundJoint.x obj.groundJoint.y 0] + [obj.nonGroundJoints(1).x / 2, obj.nonGroundJoints(1).y / 2, 0]
-            else
-                disp(obj.num)
-                comCoords = [obj.nonGroundJoints(1).x obj.nonGroundJoints(1).y 0] + [obj.nonGroundJoints(2).x / 2 obj.nonGroundJoints(2).y / 2 0]
-            end
-            % HACK: if ternary, i.e. CDE, use hardcoded from Onshape
-            if 3 == length(obj.joints)
-                disp(obj.num)
-                % jD + distance 1.2463 away => COM of CDE at (0.32, 1.3)
-                comCoords = [0.32 1.3 0];
-            end
-            % HACK: if FG, use gripper as one endpoint
-            for joint = obj.joints
-                if joint.name == "G"
-                    comCoords = [obj.groundJoint.x obj.groundJoint.y 0] + [-1.225 / 2, 3.450 / 2, 0]
-                end
-            end
         end
 
         function comVectorsStruct = computeJointToCOMVectors(obj)

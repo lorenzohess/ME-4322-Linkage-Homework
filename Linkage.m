@@ -34,12 +34,12 @@ classdef Linkage
             obj.jF = Joint("F", -0.98, 2.57, false, 'c.');
             obj.jG = Joint("G", 0.05, 0.2, true, 'k.');
 
-            obj.l1 = Crank("1", 0.5726, 8.35, 0.266, [obj.jA obj.jB]);
+            obj.l1 = Crank("1", 0.5726, 8.35, 0.266, [obj.jA obj.jB], [1.535 0.7375 0]);
             obj.crank = obj.l1;
-            obj.l2 = Link("2", 1.4157, 20.2, 3.528, [obj.jB obj.jC]);
-            obj.l3 = Link("3", 2.4866, 34.85, 18.54, [obj.jD, obj.jC, obj.jE]);
-            obj.l4 = Link("4", 1.1754, 16.82, 2.05, [obj.jE obj.jF]);
-            obj.l5 = Link("5", 2.5841, 62.11, 103, [obj.jG obj.jF]);
+            obj.l2 = Link("2", 1.4157, 20.2, 3.528, [obj.jB obj.jC], [0.9624 1.0125 0]);
+            obj.l3 = Link("3", 2.4866, 34.85, 18.54, [obj.jD, obj.jC, obj.jE], [0.24 1.2975 0]);
+            obj.l4 = Link("4", 1.1754, 16.82, 2.05, [obj.jE obj.jF], [-0.465 1.385 0]);
+            obj.l5 = Link("5", 2.5841, 62.11, 103, [obj.jG obj.jF], [-0.3925 2.555 0]);
 
             obj.plots = plots;
         end
