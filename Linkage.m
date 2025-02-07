@@ -51,24 +51,28 @@ classdef Linkage
             ABbx  = bx;
             ABay  = ay;
             ABby  = by;
-            BCbx  = -1 * bx;
-            BCby  = -1 * by;
+
+            BCbx  = -1 * ABax;
+            BCby  = -1 * ABay;
             BCcx  = cx;
             BCcy  = cy;
-            EFex  = ex;
-            EFey  = ey;
-            EFfx  = fx;
-            EFfy  = fy;
-            FGfx  = -1 * fx;
-            FGfy  = -1 * fy;
-            FGgx  = gx;
-            FGgy  = gy;
-            CDEcx = -1 * cx;
-            CDEcy = -1 * cy;
+
+            CDEcx = -1 * BCcx;
+            CDEcy = -1 * BCcy;
             CDEdx = dx;
             CDEdy = dy;
-            CDEex = -1 * ex;
-            CDEey = -1 * ey;
+            CDEex = ex;
+            CDEey = ey;
+
+            EFex  = -1 * CDEex;
+            EFey  = -1 * CDEey;
+            EFfx  = fx;
+            EFfy  = fy;
+
+            FGfx  = -1 * EFfx;
+            FGfy  = -1 * EFfy;
+            FGgx  = gx;
+            FGgy  = gy;
 
             ABx = ABax + ABbx == 0;
             BCx = -BCbx + BCcx == 0;
