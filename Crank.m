@@ -9,8 +9,8 @@ classdef Crank < Link
     end
 
     methods
-        function obj = Crank(num, length, mass, mmi, joints)
-            obj@Link(num, length, mass, mmi, joints);
+        function obj = Crank(num, length, mass, mmi, joints, comCoords)
+            obj@Link(num, length, mass, mmi, joints, comCoords);
             obj.angularVelocity = obj.INPUT_ANGULAR_VELOCITY;
             obj.symAngularVelocity = obj.INPUT_ANGULAR_VELOCITY;
             obj.angularAcceleration = obj.INPUT_ANGULAR_ACCELERATION;

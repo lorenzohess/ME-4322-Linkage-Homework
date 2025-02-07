@@ -74,30 +74,30 @@ classdef Linkage
             FGgx  = gx;
             FGgy  = gy;
 
-            ABx = ABax + ABbx == 0;
-            BCx = -BCbx + BCcx == 0;
-            CDEx = CDEcx + CDEdx - CDEex == 0;
-            EFx = -EFex + EFfx == 0;
-            FGx = -FGfx + FGgx == 0;
+            ABx = ABax - ABbx == 0;
+            BCx = BCbx - BCcx == 0;
+            CDEx = CDEcx - CDEdx - CDEex == 0;
+            EFx = EFex - EFfx == 0;
+            FGx = FGfx - FGgx == 0;
 
-            ABy = ABay + ABby - obj.crank.weight == 0;
+            ABy = -ABay + ABby - obj.crank.weight == 0;
             BCy = -BCby + BCcy - obj.l2.weight == 0;
-            CDEy = CDEcy + CDEdy - CDEey - obj.l3.weight == 0;
+            CDEy = -CDEcy + CDEdy - CDEey - obj.l3.weight == 0;
             EFy = -EFey + EFfy - obj.l4.weight == 0;
             FGy = -FGfy + FGgy - obj.l5.weight - obj.Wart == 0;
 
             % About A
-            MAB = [0 0 Tin] + cross(obj.crank.jointToCOMVector(obj.jA), [0 -obj.crank.weight 0]) +...
-                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx +ABby 0]) == 0;
+            MAB = [0 0 -Tin] + cross(obj.crank.jointToCOMVector(obj.jA), [0 -obj.crank.weight 0]) +...
+                  cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [-ABbx ABby 0]) == 0;
 
             % About B
             MBC = cross(obj.l2.jointToCOMVector(obj.jB), [0 -obj.l2.weight 0]) +...
-                  cross(obj.l2.jointToJointVector(obj.jC, obj.jB), [-BCcx -BCcy 0]) == 0;
+                  cross(obj.l2.jointToJointVector(obj.jC, obj.jB), [-BCcx BCcy 0]) == 0;
 
             % About C
             MCDE = cross(obj.l3.jointToCOMVector(obj.jC), [0 -obj.l3.weight 0]) +...
-                  cross(obj.l3.jointToJointVector(obj.jE, obj.jC), [-CDEex -CDEey 0]) + ...
-                  cross(obj.l3.jointToJointVector(obj.jD, obj.jC), [CDEdx CDEdy 0]) == 0;
+                  cross(obj.l3.jointToJointVector(obj.jE, obj.jC), [-CDEex CDEey 0]) + ...
+                  cross(obj.l3.jointToJointVector(obj.jD, obj.jC), [-CDEdx CDEdy 0]) == 0;
 
             % About E
             MEF = cross(obj.l4.jointToCOMVector(obj.jE), [0 -obj.l4.weight 0]) +...
@@ -105,16 +105,67 @@ classdef Linkage
 
             % About G
             MFG = cross(obj.l5.jointToCOMVector(obj.jG), [0 -obj.l5.weight 0]) +...
-                  cross(obj.l5.jointToJointVector(obj.jF, obj.jG), [FGfx FGfy 0]) +...
+                  cross(obj.l5.jointToJointVector(obj.jF, obj.jG), [FGfx -FGfy 0]) +...
                   cross(obj.l5.jointToJointVector(obj.artifactVector, obj.jG), [0 -obj.Wart 0]) == 0;
 
             eqns = [ABx, BCx, CDEx, EFx, FGx, ABy, BCy, CDEy, EFy, FGy, MAB, MBC, MCDE, MEF, MFG];
             vars = [ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin];
 
-            soln = solve(eqns, vars)
-            arrayfun(@double, table2array(struct2table(soln))')
-            % [0 0 soln.Tin] - cross(obj.crank.jointToJointVector(obj.crank.com, obj.jA), [0 -obj.crank.weight 0]) -...
-            %       cross(obj.crank.jointToJointVector(obj.jB, obj.jA), [soln.bx soln.by 0])
+            soln = solve(eqns, vars);
+            soln = arrayfun(@double, table2array(struct2table(soln))');
+            soln_ax  = soln(1);
+            soln_ay  = soln(2);
+            soln_bx  = soln(3);
+            soln_by  = soln(4);
+            soln_cx  = soln(5);
+            soln_cy  = soln(6);
+            soln_dx  = soln(7);
+            soln_dy  = soln(8);
+            soln_ex  = soln(9);
+            soln_ey  = soln(10);
+            soln_fx  = soln(11);
+            soln_fy  = soln(12);
+            soln_gx  = soln(13);
+            soln_gy  = soln(14);
+            soln_Tin = soln(15);
+
+            % Expected:
+            expected_soln_ax  = 734.7777;
+            expected_soln_ay  = 157.627;
+            expected_soln_bx  = -734.7777;
+            expected_soln_by  = -75.7135;
+            expected_soln_dx  = -455.4051;
+            expected_soln_dy  = 539.6962;
+            expected_soln_ex  = -279.3726;
+            expected_soln_ey  = -75.3692;
+            expected_soln_cx  = -734.7777;
+            expected_soln_cy  = 122.4485;
+            expected_soln_fx  = -279.3726;
+            expected_soln_fy  = 89.635;
+            expected_soln_gx  = -279.3726;
+            expected_soln_gy  = 898.9341;
+            expected_soln_Tin = -339.5618;
+
+
+            obj.compareSolns("ax", soln_ax, expected_soln_ax)
+            obj.compareSolns("ay", soln_ay, expected_soln_ay)
+            obj.compareSolns("bx", soln_bx, expected_soln_bx)
+            obj.compareSolns("by", soln_by, expected_soln_by)
+            obj.compareSolns("cx", soln_cx, expected_soln_cx)
+            obj.compareSolns("cy", soln_cy, expected_soln_cy)
+            obj.compareSolns("dx", soln_dx, expected_soln_dx)
+            obj.compareSolns("dy", soln_dy, expected_soln_dy)
+            obj.compareSolns("ex", soln_ex, expected_soln_ex)
+            obj.compareSolns("ey", soln_ey, expected_soln_ey)
+            obj.compareSolns("fx", soln_fx, expected_soln_fx)
+            obj.compareSolns("fy", soln_fy, expected_soln_fy)
+            obj.compareSolns("gx", soln_gx, expected_soln_gx)
+            obj.compareSolns("gy", soln_gy, expected_soln_gy)
+            obj.compareSolns("Tin", soln_Tin, expected_soln_Tin)
+        end
+
+        function compareSolns(obj, s, mine, pmks)
+            disp(s + " ==> Mine: " + num2str(mine) + "   PMKS: " + num2str(pmks))
         end
 
         function analyzeDynamics(obj)
