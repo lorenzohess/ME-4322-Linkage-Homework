@@ -295,14 +295,60 @@ where $\vec{a}_{s,ik/i}$ and $\vec{a}_{i/j}$ are both of the form described abov
 \subsubsection{Joint Forces and Torques}%
 \label{res.first.joints}
 
+My program output for analyzing statics is shown in Figure \ref{fig:static-forces}. Recall that the left-hand variables are symbolic. Various checks indicate the results make sense. Forces ABax (\texttt{ax}) and ABbx (\texttt{bx}) are the only x-forces on link AB and point in opposite directions on the FBD; thus it makes sense they should have the same magnitude.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.6]{../static-forces.png}
+  \caption{\label{fig:static-forces}Program output for \texttt{analyzeStatics()}.}
+\end{figure}
+
 \subsubsection{Postion, Velocity, and Acceleration}%
 \label{res.first.kin}
 
-\subsubsection{Masses and Mass Moments of Inertia}%
-\label{res.first.mass-mmi}
+After $1\degree$ of rotation, non-trivial joint coordinates are:
+\begin{enumerate}
+        \item[B]  1.6787,  0.9852
+        \item[C]  0.26393, 1.0352
+        \item[E]  0.21116, 2.5405
+        \item[F] -0.9637,  2.5770
+\end{enumerate}
+
+The non-trivial joint velocities are:
+\begin{enumerate}
+        \item[B] 0.93032, -0.51847
+        \item[C] 0.94938,  0.02040
+        \item[E] 2.40728,  0.07152
+        \item[F] 2.43733,  1.03942
+\end{enumerate}
+
+The non-trivial joint accelerations are:
+\begin{enumerate}
+        \item[B] -0.96436, -1.73039
+        \item[C] -0.73073, -0.93563
+        \item[E] -1.8337, -2.38806
+        \item[F] 0.88135, -2.57788
+\end{enumerate}
 
 \subsection{Plots}%
 \label{res.plots}
+
+All my plots are saved in the \texttt{matlab-plots} folder. Many are shown in various Figures in Section \ref{res.compare}. The dynamic forces are shown in Figures \ref{fig:dyn-f-x} and \ref{fig:dyn-f-y}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.6]{../matlab-plots/dynamicForcesX.png}
+  \caption{\label{fig:dyn-f-x}Dynamic forces in x-direction.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.6]{../matlab-plots/dynamicForcesY.png}
+  \caption{\label{fig:dyn-f-y}Dynamic forces in y-direction.}
+\end{figure}
+
+
+
 
 \subsection{Comparison with PMKS+}%
 \label{res.compare}
@@ -310,7 +356,7 @@ where $\vec{a}_{s,ik/i}$ and $\vec{a}_{i/j}$ are both of the form described abov
 \subsubsection{Joint Position}%
 \label{res.compare.linJointPos}
 
-Comparison of the linear joint positions is shown in Figure \ref{fig:compare.linJointPos}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Positions for ground joints are trivial (joint coordinates).
+Comparison of the linear joint positions is shown in Figure \ref{fig:compare.linJointPos}. By inspection, the values are similar, though differences in computational methods yield results that are not exactly equivalent. Positions for ground joints are trivial (simply the joint coordinates).
 
 \begin{figure}[ht]
   \centering
@@ -344,8 +390,8 @@ Comparison of the joint accelerations is shown in Figure \ref{fig:compare.linJoi
 
 \begin{figure}[ht]
   \centering
-  % \includegraphics[scale=0.5]{../matlab-plots/linJointAccX.png}%
-  % \includegraphics[scale=0.5]{../matlab-plots/linJointAccY.png}\\
+  \includegraphics[scale=0.5]{../matlab-plots/linJointAccelX.png}%
+  \includegraphics[scale=0.5]{../matlab-plots/linJointAccelY.png}\\
 
   \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccB.png}%
   \includegraphics[scale=0.45]{../pmks-plots/linJointAcc/linJointAccC.png}
@@ -364,11 +410,11 @@ Comparison of the link angular velocity is shown in Figure \ref{fig:compare.angL
   \centering
   \includegraphics[scale=0.5]{../matlab-plots/angLinkVel.png}
 
-  BC \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelCB.png}%
-  CDE \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelCDE.png}
+  BC \includegraphics[scale=0.35]{../pmks-plots/angLinkVel/angLinkVelCB.png}%
+  \hs CDE \includegraphics[scale=0.35]{../pmks-plots/angLinkVel/angLinkVelCDE.png}
 
-  EF \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelEF.png}%
-  FG \includegraphics[scale=0.4]{../pmks-plots/angLinkVel/angLinkVelFG.png}%
+  EF \includegraphics[scale=0.35]{../pmks-plots/angLinkVel/angLinkVelEF.png}%
+  \hs FG \includegraphics[scale=0.35]{../pmks-plots/angLinkVel/angLinkVelFG.png}%
   \caption{\label{fig:compare.angLinkVel}Link angular velocity comparison: my results (above) and PMKS+ (below).}
 \end{figure}
 
@@ -381,14 +427,19 @@ Comparison of the link angular acceleration is shown in Figure \ref{fig:compare.
   \centering
   \includegraphics[scale=0.5]{../matlab-plots/angLinkAccel.png}
 
-  BC \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccBC.png}%
-  CDE \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccCDE.png}
+  BC \includegraphics[scale=0.35]{../pmks-plots/angLinkAcc/angLinkAccBC.png}%
+  \hs CDE \includegraphics[scale=0.35]{../pmks-plots/angLinkAcc/angLinkAccCDE.png}
 
-  EF \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccEF.png}%
-  FG \includegraphics[scale=0.4]{../pmks-plots/angLinkAcc/angLinkAccFG.png}%
+  EF \includegraphics[scale=0.35]{../pmks-plots/angLinkAcc/angLinkAccEF.png}%
+  \hs FG \includegraphics[scale=0.35]{../pmks-plots/angLinkAcc/angLinkAccFG.png}%
   \caption{\label{fig:compare.angLinkAcc}Link angular acceleration comparison: my results (above) and PMKS+ (below).}
 \end{figure}
 
+
+\subsubsection{Static Force}%
+\label{res.compare.static-force}
+
+As shown in Figure \ref{fig:static-forces}, my output approximately aligns with that of PMKS+. While the PMKS+ values differ, my values are similar in magnitude, and the PMKS+ sign convention appears to account for differences in sign.
 
 \section{MATLAB Code}%
 \label{code}
@@ -397,20 +448,20 @@ I have employed object-oriented programming to manage state across a single even
 
 This entire report, its code, and media like photos and plots are all stored at this Github repository: \href{https://github.com/lorenzohess/ME-4322-Linkage-Homework}{github.com/lorenzohess/ME-4322-Linkage-Homework}. To run the program, invoke \texttt{linkage\_analysis.m}. Note that this script presumes a certain folder hierarchy, so simply downloading the script (even with associated classes) will not necessarily work. This code works on Arch Linux, and although untested on Windows and Mac, should work out of the box. The simulation takes about 5 minutes to run, with some of that time devoted to generating images from plots.
 
-\subsection{\texttt{linkage\_analysis.m}}%
-
-\subsection{\texttt{Linkage.m}}%
-
-\subsection{\texttt{Link.m}}%
-
-\subsection{\texttt{Crank.m}}%
-
-\subsection{\texttt{Joint.m}}%
-
-\subsection{\texttt{compute\_coords.m}}%
-
 \section{Discussion}%
 \label{discuss}
+
+By inspection of values at the peaks and troughs of the curves, most of my results align closely with those from PMKS+. The exceptions are: 1) the angular acceleration of links EF and FG; 2) thus the linear COM accelerations of CDE, EF, and FG; 3) the linear acceleration of joint F. This may partially be the result of the high mass moment of inertia of link FG (103kgm$^{2}$)
+
+The dynamic forces are of smaller magnitude, on the order of 10s of Newtons, than the static forces, which are on the order of hundreds of Newtons. Though perhaps counterintuitive, a dynamic link doesn't require the net forces to be reduced to zero; rather, the net forces can sometimes be reduced to a positive quantity (M$\vec{a}$).
+
+We require a maximum motor torque of about 2500 Nm and a minimum torque of about -1300 Nm. The speed would be slow for most motors; about 18 rpm. Thus, a DC motor, for example, ideally brushless, with a gear reduction to convert high speed into torque would be a good candidate.
+
+max min joint and motor torque
+
+I chose 7075 Aluminum because of its good performance and lower density compared to stronger materials like steel. The 7075 alloy appears to have high fatgiue strength, and, according to \href{https://www.xometry.com/resources/materials/7075-aluminum-alloy/#:~:text=7075%20aluminum%20employs%20a%20high%20zinc%20content,is%20quite%20susceptible%20to%20embrittlement%20because%20of}{Xometry}, is ``widely employed in highly stressed structural applications''.
+
+Any prototype would need to maintain mechanical ``similarity'', which could be thought of along the lines of thermofluidic similarity. A scale model would need to be built out of a material whose properties also ``scaled'' compared to those of the production material. In all likelihood, it would be easier to simply build a life-size model out of the actual material. Proper care would be taken during testing to ensure that testing would not accidentally damage the prototype and introduce safety risks.
 
 \section{References}%
 \label{ref}

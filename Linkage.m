@@ -40,13 +40,13 @@ classdef Linkage
             obj.l2 = Link("2", 1.4157, 20.2, 3.528, [obj.jB obj.jC], [0.9624 1.0125 0], 'r.');
             obj.l3 = Link("3", 2.4866, 34.85, 18.54, [obj.jD, obj.jC, obj.jE], [0.24 1.2975 0], 'g.');
             obj.l4 = Link("4", 1.1754, 16.82, 2.05, [obj.jE obj.jF], [-0.465 1.385 0], 'b.');
-            obj.l5 = Link("5", 2.5841, 62.11, 103, [obj.jG obj.jF], [-0.3925 2.555 0], 'c.');
+            obj.l5 = Link("5", 2.5841, 36.16, 20.65, [obj.jG obj.jF], [-0.3925 2.555 0], 'c.');
             obj.links = {obj.crank, obj.l2, obj.l3, obj.l4, obj.l5};
 
             obj.plots = plots;
         end
 
-        function analyzeStatics(obj)
+        function soln = analyzeStatics(obj)
             syms ax ay bx by cx cy dx dy ex ey fx fy gx gy Tin;
 
             ABax  = ax;
@@ -118,6 +118,9 @@ classdef Linkage
 
             soln = solve(eqns, vars);
             soln = arrayfun(@double, table2array(struct2table(soln))');
+        end
+
+        function printStaticsFirstPos(obj, soln)
             soln_ax  = soln(1);
             soln_ay  = soln(2);
             soln_bx  = soln(3);
@@ -151,22 +154,21 @@ classdef Linkage
             expected_soln_gy  = 898.9341;
             expected_soln_Tin = -339.5618;
 
-
-            % obj.compareSolns("ax", soln_ax, expected_soln_ax)
-            % obj.compareSolns("ay", soln_ay, expected_soln_ay)
-            % obj.compareSolns("bx", soln_bx, expected_soln_bx)
-            % obj.compareSolns("by", soln_by, expected_soln_by)
-            % obj.compareSolns("cx", soln_cx, expected_soln_cx)
-            % obj.compareSolns("cy", soln_cy, expected_soln_cy)
-            % obj.compareSolns("dx", soln_dx, expected_soln_dx)
-            % obj.compareSolns("dy", soln_dy, expected_soln_dy)
-            % obj.compareSolns("ex", soln_ex, expected_soln_ex)
-            % obj.compareSolns("ey", soln_ey, expected_soln_ey)
-            % obj.compareSolns("fx", soln_fx, expected_soln_fx)
-            % obj.compareSolns("fy", soln_fy, expected_soln_fy)
-            % obj.compareSolns("gx", soln_gx, expected_soln_gx)
-            % obj.compareSolns("gy", soln_gy, expected_soln_gy)
-            % obj.compareSolns("Tin", soln_Tin, expected_soln_Tin)
+            obj.compareSolns("ax", soln_ax, expected_soln_ax)
+            obj.compareSolns("ay", soln_ay, expected_soln_ay)
+            obj.compareSolns("bx", soln_bx, expected_soln_bx)
+            obj.compareSolns("by", soln_by, expected_soln_by)
+            obj.compareSolns("cx", soln_cx, expected_soln_cx)
+            obj.compareSolns("cy", soln_cy, expected_soln_cy)
+            obj.compareSolns("dx", soln_dx, expected_soln_dx)
+            obj.compareSolns("dy", soln_dy, expected_soln_dy)
+            obj.compareSolns("ex", soln_ex, expected_soln_ex)
+            obj.compareSolns("ey", soln_ey, expected_soln_ey)
+            obj.compareSolns("fx", soln_fx, expected_soln_fx)
+            obj.compareSolns("fy", soln_fy, expected_soln_fy)
+            obj.compareSolns("gx", soln_gx, expected_soln_gx)
+            obj.compareSolns("gy", soln_gy, expected_soln_gy)
+            obj.compareSolns("Tin", soln_Tin, expected_soln_Tin)
         end
 
         function compareSolns(obj, s, mine, pmks)
@@ -191,6 +193,13 @@ classdef Linkage
 
                 obj.updateCOMAccelerations();
                 obj.plotCOMAccelerations()
+
+                obj.updateDynamicForces();
+                obj.plotDynamicForcesX();
+                obj.plotDynamicForcesY();
+
+                obj.updateLinearJointAccelerations();
+
             end
         end
 
@@ -275,6 +284,8 @@ classdef Linkage
             legend(obj.plots.linJointVelX, [obj.jB.hSeries, obj.jC.hSeries, obj.jE.hSeries, obj.jF.hSeries],...
                    {obj.jB.seriesName, obj.jC.seriesName, obj.jE.seriesName, obj.jF.seriesName}, 'Location', 'Best');
 
+            xlim(obj.plots.linJointVelX, [0, 360])
+
             % Y
             obj.jB.generateLegendInfo(obj.plots.linJointVelY);
             obj.jC.generateLegendInfo(obj.plots.linJointVelY);
@@ -288,11 +299,13 @@ classdef Linkage
 
             legend(obj.plots.linJointVelY, [obj.jB.hSeries, obj.jC.hSeries, obj.jE.hSeries, obj.jF.hSeries],...
                    {obj.jB.seriesName, obj.jC.seriesName, obj.jE.seriesName, obj.jF.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.linJointVelY, [0, 360])
         end
 
         function updateAngularAccelerations(obj)
             loop1 = obj.crank.getSymAcceleration() + obj.l2.getSymAcceleration(obj.jB, obj.jC) + obj.l3.getSymAcceleration(obj.jC, obj.jD);
-            loop2 = obj.l3.getSymAcceleration(obj.jE) + obj.l4.getSymAcceleration(obj.jE, obj.jF) + obj.l5.getSymAcceleration(obj.jF, obj.jG);
+            loop2 = obj.l3.getSymAcceleration(obj.jD, obj.jE) + obj.l4.getSymAcceleration(obj.jE, obj.jF) + obj.l5.getSymAcceleration();
 
             soln = solve([loop1, loop2], [obj.l2.symAngularAcceleration, obj.l3.symAngularAcceleration,...
                                           obj.l4.symAngularAcceleration, obj.l5.symAngularAcceleration]);
@@ -302,7 +315,43 @@ classdef Linkage
             obj.l5.angularAcceleration = soln.alpha5;
         end
 
-        function updateJointAccelerations(obj)
+        function updateLinearJointAccelerations(obj)
+            jBlinAcc = obj.crank.getJointCurrentAcceleration();
+            jClinAcc = obj.l3.getJointCurrentAcceleration(obj.jC);
+            jElinAcc = obj.l3.getJointCurrentAcceleration(obj.jE);
+            jFlinAcc = obj.l5.getJointCurrentAcceleration();
+
+            % X
+            obj.jB.generateLegendInfo(obj.plots.linJointAccelX);
+            obj.jC.generateLegendInfo(obj.plots.linJointAccelX);
+            obj.jE.generateLegendInfo(obj.plots.linJointAccelX);
+            obj.jF.generateLegendInfo(obj.plots.linJointAccelX);
+
+            plot(obj.plots.linJointAccelX, obj.crank.stepCounter, jBlinAcc(1), obj.jB.color)
+            plot(obj.plots.linJointAccelX, obj.crank.stepCounter, jClinAcc(1), obj.jC.color)
+            plot(obj.plots.linJointAccelX, obj.crank.stepCounter, jElinAcc(1), obj.jE.color)
+            plot(obj.plots.linJointAccelX, obj.crank.stepCounter, jFlinAcc(1), obj.jF.color)
+
+            legend(obj.plots.linJointAccelX, [obj.jB.hSeries, obj.jC.hSeries, obj.jE.hSeries, obj.jF.hSeries],...
+                   {obj.jB.seriesName, obj.jC.seriesName, obj.jE.seriesName, obj.jF.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.linJointAccelX, [0, 360])
+
+            % Y
+            obj.jB.generateLegendInfo(obj.plots.linJointAccelY);
+            obj.jC.generateLegendInfo(obj.plots.linJointAccelY);
+            obj.jE.generateLegendInfo(obj.plots.linJointAccelY);
+            obj.jF.generateLegendInfo(obj.plots.linJointAccelY);
+
+            plot(obj.plots.linJointAccelY, obj.crank.stepCounter, jBlinAcc(2), obj.jB.color)
+            plot(obj.plots.linJointAccelY, obj.crank.stepCounter, jClinAcc(2), obj.jC.color)
+            plot(obj.plots.linJointAccelY, obj.crank.stepCounter, jElinAcc(2), obj.jE.color)
+            plot(obj.plots.linJointAccelY, obj.crank.stepCounter, jFlinAcc(2), obj.jF.color)
+
+            legend(obj.plots.linJointAccelY, [obj.jB.hSeries, obj.jC.hSeries, obj.jE.hSeries, obj.jF.hSeries],...
+                   {obj.jB.seriesName, obj.jC.seriesName, obj.jE.seriesName, obj.jF.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.linJointAccelY, [0, 360])
         end
 
         function updateCOMAccelerations(obj)
@@ -320,6 +369,13 @@ classdef Linkage
             obj.l4.COMAcceleration = accCOMToF + accFToG;
         end
 
+        function updateDynamicForces(obj)
+            for i = 1:numel(obj.links)
+                link = obj.links{i};
+                link.dynamicForce = link.mass * link.COMAcceleration;
+            end
+        end
+
         %%% Plotting
         function plotLinkAngularVelocities(obj)
             obj.l2.generateLegendInfo(obj.plots.angLinkVel);
@@ -335,6 +391,8 @@ classdef Linkage
 
             legend(obj.plots.angLinkVel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
                    {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.angLinkVel, [0, 360])
         end
 
         function plotLinkAngularAccelerations(obj)
@@ -350,6 +408,8 @@ classdef Linkage
 
             legend(obj.plots.angLinkAccel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
                    {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.angLinkAccel, [0, 360])
         end
 
         function plotCOMAccelerations(obj)
@@ -365,6 +425,44 @@ classdef Linkage
 
             legend(obj.plots.linCOMAccel, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
                    {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.linCOMAccel, [0, 360])
+        end
+
+        function plotDynamicForcesX(obj)
+            obj.crank.generateLegendInfo(obj.plots.dynamicForcesX)
+            obj.l2.generateLegendInfo(obj.plots.dynamicForcesX);
+            obj.l3.generateLegendInfo(obj.plots.dynamicForcesX);
+            obj.l4.generateLegendInfo(obj.plots.dynamicForcesX);
+            obj.l5.generateLegendInfo(obj.plots.dynamicForcesX);
+
+            plot(obj.plots.dynamicForcesX, obj.crank.stepCounter, obj.l2.COMAcceleration(1), obj.l2.plotFormat)
+            plot(obj.plots.dynamicForcesX, obj.crank.stepCounter, obj.l3.COMAcceleration(1), obj.l3.plotFormat)
+            plot(obj.plots.dynamicForcesX, obj.crank.stepCounter, obj.l4.COMAcceleration(1), obj.l4.plotFormat)
+            plot(obj.plots.dynamicForcesX, obj.crank.stepCounter, obj.l5.COMAcceleration(1), obj.l5.plotFormat)
+
+            legend(obj.plots.dynamicForcesX, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.dynamicForcesX, [0, 360])
+        end
+
+        function plotDynamicForcesY(obj)
+            obj.crank.generateLegendInfo(obj.plots.dynamicForcesY)
+            obj.l2.generateLegendInfo(obj.plots.dynamicForcesY);
+            obj.l3.generateLegendInfo(obj.plots.dynamicForcesY);
+            obj.l4.generateLegendInfo(obj.plots.dynamicForcesY);
+            obj.l5.generateLegendInfo(obj.plots.dynamicForcesY);
+
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l2.COMAcceleration(1), obj.l2.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l3.COMAcceleration(1), obj.l3.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l4.COMAcceleration(1), obj.l4.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l5.COMAcceleration(1), obj.l5.plotFormat)
+
+            legend(obj.plots.dynamicForcesY, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
+                   {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');
+
+            xlim(obj.plots.dynamicForcesY, [0, 360])
         end
     end
 end
