@@ -120,7 +120,9 @@ classdef Linkage
             soln = arrayfun(@double, table2array(struct2table(soln))');
         end
 
-        function printStaticsFirstPos(obj, soln)
+        function analyzeStaticsFirstPos(obj)
+            soln = obj.analyzeStatics();
+
             soln_ax  = soln(1);
             soln_ay  = soln(2);
             soln_bx  = soln(3);
@@ -176,10 +178,15 @@ classdef Linkage
         end
 
         function analyzeDynamics(obj)
+            staticTorques = [];
             for i = obj.crank.START_ANGLE:obj.crank.STEP_ANGLE:obj.crank.END_ANGLE
                 % Update crank angle
                 obj.crank.incrementAngle(obj.crank.STEP);
                 obj.crank.stepCounter = obj.crank.stepCounter + 1;
+
+                % Statics
+                statics = obj.analyzeStatics();
+                staticTorques = [staticTorques statics(15)];
 
                 obj.updatePositions();
 
@@ -201,6 +208,9 @@ classdef Linkage
                 obj.updateLinearJointAccelerations();
 
             end
+            plot([obj.crank.START_ANGLE:obj.crank.STEP_ANGLE:obj.crank.END_ANGLE], staticTorques, 'k')
+            legend("Static Torque", 'Location', 'Best')
+            xlim([0, 360])
         end
 
         function newCoords = circleIntersection(obj, joint, knownJoint1, knownJoint2, r1, r2)
@@ -454,10 +464,10 @@ classdef Linkage
             obj.l4.generateLegendInfo(obj.plots.dynamicForcesY);
             obj.l5.generateLegendInfo(obj.plots.dynamicForcesY);
 
-            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l2.COMAcceleration(1), obj.l2.plotFormat)
-            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l3.COMAcceleration(1), obj.l3.plotFormat)
-            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l4.COMAcceleration(1), obj.l4.plotFormat)
-            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l5.COMAcceleration(1), obj.l5.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l2.COMAcceleration(2), obj.l2.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l3.COMAcceleration(2), obj.l3.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l4.COMAcceleration(2), obj.l4.plotFormat)
+            plot(obj.plots.dynamicForcesY, obj.crank.stepCounter, obj.l5.COMAcceleration(2), obj.l5.plotFormat)
 
             legend(obj.plots.dynamicForcesY, [obj.l2.hSeries, obj.l3.hSeries, obj.l4.hSeries, obj.l5.hSeries],...
                    {obj.l2.seriesName, obj.l3.seriesName, obj.l4.seriesName, obj.l5.seriesName}, 'Location', 'Best');

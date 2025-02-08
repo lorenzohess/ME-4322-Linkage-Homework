@@ -4,7 +4,7 @@ format long;
 plots = initializePlots();
 
 linkage = Linkage(plots);
-% linkage.analyzeStatics()
+linkage.analyzeStaticsFirstPos()
 linkage.analyzeDynamics()
 savePlots(plots)
 
