@@ -452,17 +452,15 @@ This entire report, its code, and media like photos and plots are all stored at 
 
 By inspection of values at the peaks and troughs of the curves, most of my results align closely with those from PMKS+. The exceptions are: 1) the angular acceleration of links EF and FG; 2) thus the linear COM accelerations of CDE, EF, and FG; 3) the linear acceleration of joint F. This may partially be the result of the high mass moment of inertia of link FG (103kgm$^{2}$)
 
-The dynamic forces are of smaller magnitude, on the order of 10s of Newtons, than the static forces, which are on the order of hundreds of Newtons. Though perhaps counterintuitive, a dynamic link doesn't require the net forces to be reduced to zero; rather, the net forces can sometimes be reduced to a positive quantity (M$\vec{a}$).
+The dynamic forces are of smaller magnitude, on the order of 10s of Newtons, than the static forces, which are on the order of hundreds of Newtons. Though perhaps counterintuitive, a dynamic link doesn't require the net forces to be reduced to zero; rather, the net forces can sometimes be reduced to a positive quantity (M$\vec{a}$). I chose 7075 Aluminum because of its good performance and lower density compared to stronger materials like steel. The 7075 alloy appears to have high fatgiue strength, and, according to is ``widely employed in highly stressed structural applications'' [1].
 
-We require a maximum motor torque of about 2500 Nm and a minimum torque of about -1300 Nm. The speed would be slow for most motors; about 18 rpm. Thus, a DC motor, for example, ideally brushless, with a gear reduction to convert high speed into torque would be a good candidate.
-
-max min joint and motor torque
-
-I chose 7075 Aluminum because of its good performance and lower density compared to stronger materials like steel. The 7075 alloy appears to have high fatgiue strength, and, according to \href{https://www.xometry.com/resources/materials/7075-aluminum-alloy/#:~:text=7075%20aluminum%20employs%20a%20high%20zinc%20content,is%20quite%20susceptible%20to%20embrittlement%20because%20of}{Xometry}, is ``widely employed in highly stressed structural applications''.
+We require a maximum motor torque of about 2500 Nm and a minimum torque of about -1300 Nm (according to PMKS+, which has the better value). The speed would be slow for most motors; about 18 rpm. Thus, a DC motor, for example, ideally brushless, with a gear reduction to convert high speed into torque would be a good candidate.
 
 Any prototype would need to maintain mechanical ``similarity'', which could be thought of along the lines of thermofluidic similarity. A scale model would need to be built out of a material whose properties also ``scaled'' compared to those of the production material. In all likelihood, it would be easier to simply build a life-size model out of the actual material. Proper care would be taken during testing to ensure that testing would not accidentally damage the prototype and introduce safety risks.
 
 \section{References}%
 \label{ref}
+
+[1]\ D. McClements and M. Conniff, ``All about 7075 aluminum alloy,'' Xometry, Dec. 19, 2024. \texttt{https://www.xometry.com/resources/materials/7075-aluminum-alloy/}
 
 \end{document}
