@@ -47,8 +47,6 @@ classdef Link < handle
 
             alpha = sym("alpha" + num2str(obj.num));
             obj.symAngularAcceleration = alpha;
-
-            % Rx = sym("Rx" + num2str(obj.num));
         end
 
         function generateLegendInfo(obj, ax)
@@ -105,18 +103,19 @@ classdef Link < handle
                              [obj.jointToJointVector(jHead, jTail)]);
         end
 
-        function velocity = getCurrentVelocity(obj, jTail, jHead)
-        % HACK: Assumes position vector goes from tail ground joint to head
-        % non-ground joint, or if neither joint is grounded, then from tail
-        % joints(1) to head joints(2).
-            if 1 == nargin % no args, ground -> non-ground, i.e. binary link
-                jTail = obj.groundJoint;
+        function velocity = getJointCurrentVelocity(obj, jHead)
+        % HACK: Assumes position vector goes from tail ground joint to jHead.
+        % If jHead isn't supplied, uses obj.nonGroundJoints(1) for jTail by
+        % default, i.e.  supply jHead for ternary link.
+            jTail = obj.groundJoint;
+            if 1 == nargin
                 jHead = obj.nonGroundJoints(1);
-            elseif 2 == nargin % jTail arg, ground -> second non-ground, i.e. ternary link
-                jTail = obj.groundJoint;
-                jHead = obj.nonGroundJoints(2);
-            else % both jTail and jHead arg
             end
+            velocity = cross(obj.getCurrentAngularVelocityVector(),...
+                             [obj.jointToJointVector(jHead, jTail)]);
+        end
+
+        function v = getCurrentVelocity(obj, jTail, jHead)
             velocity = cross(obj.getCurrentAngularVelocityVector(),...
                              [obj.jointToJointVector(jHead, jTail)]);
         end

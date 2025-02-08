@@ -5,6 +5,8 @@ classdef Joint < handle
         name
         ground % default
         color
+        hSeries
+        seriesName
     end
     properties
         x % global x coordinate
@@ -17,6 +19,11 @@ classdef Joint < handle
             obj.y = y;
             obj.color = color;
             obj.ground = ground;
+        end
+
+        function generateLegendInfo(obj, ax)
+            obj.seriesName = "Joint " + obj.name;
+            obj.hSeries = plot(ax, NaN, NaN, obj.color, 'DisplayName', obj.seriesName);
         end
 
         % Getters
