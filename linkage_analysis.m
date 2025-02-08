@@ -21,7 +21,8 @@ function savePlots(plots)
 end
 
 function plots = initializePlots()
-    crankAngleLabel = "Crank Angle (degrees)";
+    % crankAngleLabel = "Crank Angle (degrees)";
+    crankAngleLabel = "Crank Angle Change (degrees)";
     plotConfig = struct('linJointPos', {["Joint X Coordinate for Single Crank Revolution",...
                                          "Joint Y Coordinate for Single Crank Revolution",...
                                          "Joint Linear Position for Single Crank Revolution"]},...
@@ -95,7 +96,7 @@ function plots = initializePlots()
         title(plots.(fieldName), plotConfig.(fieldName)(3))
 
         % Aspect ratio
-        if (fieldName ~= "linJointPos")
+        if (fieldName ~= "linJointPos") | (fieldName ~= "linCOMAccel")
             daspect(plots.(fieldName), [30, 1, 1])
         end
     end

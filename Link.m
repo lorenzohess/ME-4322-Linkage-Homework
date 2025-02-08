@@ -184,7 +184,7 @@ classdef Link < handle
 
         function newAngle = incrementAngle(obj, value)
             obj.angle = obj.angle + value;
-            % disp("New angle: " + obj.angle)
+            disp("Crank angle: " + obj.angle)
         end
 
         function vector = jointToJointVector(obj, jHead, jTail)

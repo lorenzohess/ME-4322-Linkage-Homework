@@ -1,6 +1,6 @@
 clear; clc;
 
-% Artifact
+% Artifact coords
 syms xa ya;
 fx = -0.98; fy = 2.57;
 gx = 0.05; gy = 0.2;

@@ -126,12 +126,18 @@
 \maketitle
 \tableofcontents
 
+\newpage
 \section{Assumptions}%
 \label{assum}
 
 \begin{enumerate}
-        \item Steady-state rate of 7450 parts in seven hours
-        \item Links made of 7075 Aluminum
+  \item Steady-state rate of 7450 parts in seven hours
+  \item Links made of 7075 Aluminum
+  \item Link geometry: 10cm width, 5cm thickness, 6cm joint diameter
+  \item Negligible gripper weight
+  \item Ideal revolute joints, e.g. no friction, only one DOF
+  \item Ideal links, e.g. no deformation, fatigue
+  \item Constant input angular velocity
 \end{enumerate}
 
 \section{Schematics}%
@@ -145,12 +151,12 @@ The kinematic outline of the six-bar linkage is shown in Figure \ref{fig:kin-out
   \caption{\label{fig:kin-outline}Kinematic outline of the linkage.}
 \end{figure}
 
-A free-body diagram of each link is shown in Figure \ref{fig:fbds}.
+A free-body diagram of each link is shown in Figure \ref{fig:fbds}, with an input torque $\tau_{\text{in}}$, weights $W$, at center of masses $s$, and with artifact weight $W_{\text{art}}$.
 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.3]{../fbds.jpeg}
-  \caption{\label{fig:fbs}Free-body diagram of each link.}
+  \caption{\label{fig:fbds}Free-body diagram of each link.}
 \end{figure}
 
 \section{Statics and Dynamics Equations}%
@@ -162,9 +168,7 @@ A free-body diagram of each link is shown in Figure \ref{fig:fbds}.
 \subsubsection{Static Equilibrium}%
 \label{eqns.forces-moments.static}
 
-At static equilibrium, the net force and moment on each link is zero. Figures \ref{fig:fbd-ab}, \ref{fig:fbd-bc}, \ref{fig:fbd-cde}, \ref{fig:fbd-ef}, and \ref{fig:fbd-fg} show free-body diagrams of each link, with an input torque $\tau_{\text{in}}$, weights $W$, at center of masses $s$, and with artifact weight $W_{\text{art}}$.
-
-Each link yields one vector force equations; link AB also yields one vector moment equation. All force equations have two components, and the moment equation has three components.
+At static equilibrium, the net force and moment on each link is zero. Each link yields one vector force equation; link AB also yields one vector moment equation. All force equations have two components, and the moment equation has three components.
 
 For link AB, with moments about joint A:
 \[ R_{a,x} - R_{b,x} = 0 \hs -R_{a,y} + R_{b,y} - W_{ab} = 0 \hs \vec{\tau}_{in} + \vec{r}_{s/a}\times \vec{W}_{ab} + \vec{r}_{b/a}\times \vec{R}_{b} = 0 \]
@@ -182,14 +186,14 @@ For link FG, with moments about joint G:
 
 The dynamic equilibrium for each link is given by Newton's Second Law at the center of mass:
 \[ \Sigma \vec{F} = M \vec{a}_{s} \]
-For rotational dynamics:
-\[ \Sigma \vec{T} = J \vec{\alpha} \]
+For rotational dynamics about joint $i$:
+\[ \Sigma \vec{T}_{i} = J_{i} \vec{\alpha} \]
 We will compute the net force and torque on each link by computing $M \vec{a}_{s}$ or $J \vec{\alpha}$ after having calculated the respective accelerations.
 
 \subsection{Mass Calculations}%
 \label{eqns.masses}
 
-All links were modeled in Onshape with material of Aluminum 7075. For all binary links, the centroid of the flat face is placed at the origin and the extrude is symmetric to ensure the center of mass also coincides with the origin. Link FG was extended by 1.843m beyond joint F and uses a similar rounded end with a pin for the gripper. For link CDE, joint D is placed at the origin and joint C at 0.98m distance.  Link AB is shown as an example in Figure \ref{fig:link-AB-CAD}. The joint-to-joint center distance was varied to produce different links. The mass properties are computed with Onshape's ``Mass and Section Properties'' feature and are in Table \ref{tab:link-masses}.
+All links were modeled in Onshape with material of Aluminum 7075. For all binary links, I placed the centroid of the flat face at the origin and used a symmetric extrude to ensure the center of mass also coincides with the origin. Link FG was extended by 1.843m beyond joint F and uses the same rounded end, with a pin for the gripper. For link CDE, joint D is placed at the origin and joint C at 0.98m distance away.  Link AB is shown in Figure \ref{fig:link-AB-CAD}. The joint-to-joint center distance was varied to produce different links. The mass properties were computed with Onshape's ``Mass and Section Properties'' feature and are in Table \ref{tab:link-masses}.
 
 \begin{figure}[ht]
   \centering
@@ -211,8 +215,8 @@ All links were modeled in Onshape with material of Aluminum 7075. For all binary
   \end{center}\caption{Link masses.}\label{tab:link-masses}
 \end{table}
 
-% \subsection{Mass Moment of Inertia Calculations}%
-% \label{eqns.mmi}
+\subsection{Mass Moment of Inertia Calculations}%
+\label{eqns.mmi}
 
 The mass moments of inertia are given by Onshape's ``Mass and Section Properties'' feature mentioned in Section \ref{eqns.masses}, and are shown in Table \ref{tab:link-mmi}. The MMI is about the axis formed by the intersection of the Front and Top planes in Figure \ref{fig:link-AB-CAD}.
 
@@ -241,14 +245,14 @@ I developed my kinematic equations from two vector loops: A-B-C-D-A and D-E-F-G-
 For loop ABCDA, the position loop is:
 \[ \vec{r}_{b/a} + \vec{r}_{c/b} + \vec{r}_{d/c} + \vec{r}_{a/d} = 0 \]
 For loop DEFGD, the position loop is:
-\[ \vec{r}_{e/d} + \vec{r}_{f/e} + \vec{r}_{g/f} + \vec{r}_{g/d} = 0 \]
+\[ \vec{r}_{e/d} + \vec{r}_{f/e} + \vec{r}_{g/f} + \vec{r}_{d/g} = 0 \]
 
 \subsubsection{Velocity}%
 \label{eqns.kinematics.velocity}
 
 Differentiate the positions loop equations to derive the velocity loop equations:
 \[ \vec{v}_{b/a} + \vec{v}_{c/b} + \vec{v}_{d/c} + \vec{v}_{a/d} = 0 \]
-\[ \vec{v}_{e/d} + \vec{v}_{f/e} + \vec{v}_{g/f} + \vec{v}_{g/d} = 0 \]
+\[ \vec{v}_{e/d} + \vec{v}_{f/e} + \vec{v}_{g/f} + \vec{v}_{d/g} = 0 \]
 The velocity of a joint $j$ relative to $i$ can be decomposed into translational and rotational components:
 \[ \vec{v}_{j/i} = \vec{v}_{i} + (\omega_{ij}\times \vec{r}_{j/i}) \]
 For a ground joint $i$, $\vec{v}_{i}$ is zero. For joints $i$ and $j$ of the same rigid link, their relative translational velocity is also zero. All joints and links in this linkage satisfy these conditions, so all translational velocity terms are zero for all joints. Therefore, the velocity loop equations for the loop equations reduce to the rotational components:
